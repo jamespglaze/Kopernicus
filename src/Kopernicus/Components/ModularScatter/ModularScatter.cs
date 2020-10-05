@@ -200,7 +200,7 @@ namespace Kopernicus.Components.ModularScatter
 
                 foreach (KopernicusSurfaceObject scatterObj in surfaceObjects)
                 {
-                    Destroy(scatterObj.gameObject);
+                    Destroy(scatterObj);
                 }
             }
         }
