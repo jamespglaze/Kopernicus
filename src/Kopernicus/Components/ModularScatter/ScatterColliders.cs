@@ -54,25 +54,23 @@ namespace Kopernicus.Components.ModularScatter
         /// </summary>
         void IComponent<ModularScatter>.Update(ModularScatter system)
         {
-            PQSMod_LandClassScatterQuad[] quads = system.GetComponentsInChildren<PQSMod_LandClassScatterQuad>(true);
-            for (Int32 i = 0; i < quads.Length; i++)
+            if (system.scatterObjects.Count == scatterCount)
             {
-                var surfaceObjects = quads[i].obj.GetComponentsInChildren<KopernicusSurfaceObject>(true);
-                if (surfaceObjects.Count() == scatterCount)
-                {
-                    return;
-                }
+                return;
+            }
 
-                scatterCount = surfaceObjects.Count();
-                KopernicusSurfaceObject scatter = surfaceObjects[i];
+            scatterCount = system.scatterObjects.Count;
+            for (Int32 i = 0; i < system.scatterObjects.Count; i++)
+            {
+                GameObject scatter = system.scatterObjects[i];
                 MeshCollider collider = scatter.GetComponent<MeshCollider>();
                 if (collider)
                 {
                     continue;
                 }
 
-                MeshFilter filter = scatter.gameObject.GetComponent<MeshFilter>();
-                collider = scatter.gameObject.AddComponent<MeshCollider>();
+                MeshFilter filter = scatter.GetComponent<MeshFilter>();
+                collider = scatter.AddComponent<MeshCollider>();
                 collider.sharedMesh = CollisionMesh ? CollisionMesh : filter.sharedMesh;
                 collider.enabled = true;
             }
