@@ -224,36 +224,25 @@ namespace Kopernicus.Components.ModularScatter
                     continue;
                 }
 
-                if (!quads[i].obj.activeSelf)
+                if (quads[i].obj.name == "Unass")
                 {
+                    var surfaceObjects = quads[i].obj.GetComponentsInChildren<KopernicusSurfaceObject>(true);
+                    for (int j = 0; j < surfaceObjects.Length; j++)
+                    {
+                        Destroy(surfaceObjects[j].gameObject);
+                    }
+
                     continue;
                 }
 
-                if (quads[i].obj.name == "Unass")
+                if (!quads[i].obj.activeSelf)
                 {
                     continue;
                 }
 
                 CreateScatterMeshes(quads[i]);
                 quads[i].mesh.Clear();
-            }
 
-            for (Int32 i = 0; i < scatterObjects.Count; i++)
-            {
-                if (scatterObjects[i])
-                {
-                    if (scatterObjects[i].transform.parent.name == "Unass")
-                    {
-                        Destroy(scatterObjects[i]);
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                }
-
-                scatterObjects.RemoveAt(i);
-                i--;
             }
 
             // Update components
