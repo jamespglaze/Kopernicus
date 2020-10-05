@@ -69,7 +69,7 @@ namespace Kopernicus.Components.ModularScatter
         /// <summary>
         /// The actual models that are scattered over the surface
         /// </summary>
-        public List<KopernicusSurfaceObject> scatterObjects;
+        public List<GameObject> scatterObjects;
 
         /// <summary>
         /// Whether to treat the density calculation as an actual floating point value
@@ -143,7 +143,7 @@ namespace Kopernicus.Components.ModularScatter
             scatter = landControl.scatters.First(s => s.scatterName == scatter.scatterName); // I hate Unity
             typeof(PQSLandControl.LandClassScatter).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
                 .FirstOrDefault(f => f.FieldType == typeof(GameObject))?.SetValue(scatter, gameObject);
-            scatterObjects = new List<KopernicusSurfaceObject>();
+            scatterObjects = new List<GameObject>();
             body = Part.GetComponentUpwards<CelestialBody>(landControl.gameObject);
             GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
             if (!baseMesh && meshes.Count > 0)
@@ -199,7 +199,7 @@ namespace Kopernicus.Components.ModularScatter
         /// </summary>
         private void OnGameSceneLoadRequested(GameScenes data)
         {
-            foreach (KopernicusSurfaceObject scatterObj in scatterObjects)
+            foreach (GameObject scatterObj in scatterObjects)
             {
                 Destroy(scatterObj);
             }
@@ -214,7 +214,6 @@ namespace Kopernicus.Components.ModularScatter
             PQSMod_LandClassScatterQuad[] quads = gameObject.GetComponentsInChildren<PQSMod_LandClassScatterQuad>(true);
             for (Int32 i = 0; i < quads.Length; i++)
             {
-                scatterObjects = quads[i].obj.GetComponentsInChildren<KopernicusSurfaceObject>(true).ToList<KopernicusSurfaceObject>();
                 if (quads[i].mr && quads[i].mr.enabled)
                 {
                     quads[i].mr.enabled = false;
@@ -227,9 +226,10 @@ namespace Kopernicus.Components.ModularScatter
 
                 if (quads[i].obj.name == "Unass")
                 {
-                    for (int j = 0; j < scatterObjects.Count; j++)
+                    var surfaceObjects = quads[i].obj.GetComponentsInChildren<KopernicusSurfaceObject>(true);
+                    for (int j = 0; j < surfaceObjects.Length; j++)
                     {
-                        Destroy(scatterObjects[j].gameObject);
+                        Destroy(surfaceObjects[j].gameObject);
                     }
 
                     continue;
@@ -326,7 +326,7 @@ namespace Kopernicus.Components.ModularScatter
                 renderer.shadowCastingMode = quad.scatter.castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
                 renderer.receiveShadows = quad.scatter.recieveShadows;
                 scatterObject.layer = GameLayers.LOCAL_SPACE;
-                scatterObjects.Add(scatterObject.GetComponent<KopernicusSurfaceObject>());
+                scatterObjects.Add(scatterObject);
             }
 
             quad.obj.name = "Kopernicus-" + quad.scatter.scatterName;
