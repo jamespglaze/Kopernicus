@@ -72,11 +72,7 @@ namespace Kopernicus.Components.ModularScatter
                 float distance = Vector3.Distance(FlightGlobals.ActiveVessel.transform.position, scatter.transform.position);
                 if (distance > max)
                 {
-                    MeshCollider collider = scatter.GetComponent<MeshCollider>();
-                    if (collider)
-                    {
-                        GameObject.DestroyImmediate(scatter.GetComponent<MeshCollider>());
-                    }
+                    GameObject.Destroy(scatter.GetComponent<MeshCollider>());
                 }
                 else
                 {
