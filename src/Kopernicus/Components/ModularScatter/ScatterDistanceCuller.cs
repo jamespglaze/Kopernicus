@@ -18,7 +18,22 @@ namespace Kopernicus.Components.ModularScatter
         private void Update()
         {
             float maxdistance = Kopernicus.RuntimeUtility.RuntimeUtility.KopernicusConfig.ScatterCullDistance;
-            float distance = Vector3.Distance(Camera.current.transform.position, surfaceObject.transform.position);
+            float distance = 0;
+            if (HighLogic.LoadedSceneIsFlight)
+            {
+                try
+                {
+                    distance = Vector3.Distance(FlightGlobals.ActiveVessel.transform.position, surfaceObject.transform.position);
+                }
+                catch
+                {
+                    //If craft breaks up this prevents errors.
+                }
+            }
+            else
+            {
+                distance = Vector3.Distance(Camera.current.transform.position, surfaceObject.transform.position);
+            }
 
             if (distance > maxdistance)
             {
