@@ -62,9 +62,10 @@ namespace Kopernicus.Components.ModularScatter
             Boolean inFlight = false;
             if (HighLogic.LoadedSceneIsFlight)
             {
-                width = FlightGlobals.ActiveVessel.vesselSize.x;
-                height = FlightGlobals.ActiveVessel.vesselSize.y;
-                length = FlightGlobals.ActiveVessel.vesselSize.z;
+                Vector3 activeVesselSize = FlightGlobals.ActiveVessel.vesselSize;
+                width = activeVesselSize.x;
+                height = activeVesselSize.y;
+                length = activeVesselSize.z;
                 max = Mathf.Max(width, height, length);
                 inFlight = true;
             }
@@ -73,38 +74,40 @@ namespace Kopernicus.Components.ModularScatter
             for (Int32 i = 0; i < quads.Length; i++)
             {
                 var surfaceObjects = quads[i].obj.GetComponentsInChildren<KopernicusSurfaceObject>(true);
+                scatterCount = surfaceObjects.Count();
                 if (surfaceObjects.Count() == scatterCount)
                 {
                     return;
                 }
-                scatterCount = surfaceObjects.Count();
-                KopernicusSurfaceObject scatter = surfaceObjects[i];
-                if (inFlight)
+                for (Int32 i2 = 0; i < surfaceObjects.Length; i++)
                 {
-                    distance = Vector3.Distance(FlightGlobals.ActiveVessel.transform.position, scatter.transform.position);
-                }
-
-                MeshCollider collider = scatter.GetComponent<MeshCollider>();
-                if (distance > max)
-                {
-                    if (collider)
+                    KopernicusSurfaceObject scatter = surfaceObjects[i2];
+                    if (inFlight)
                     {
-                        GameObject.Destroy(collider);
-                    }
-                }
-                else
-                {
-                    if (collider)
-                    {
-                        continue;
+                        distance = Vector3.Distance(FlightGlobals.ActiveVessel.transform.position, scatter.transform.position);
                     }
 
-                    MeshFilter filter = scatter.gameObject.GetComponent<MeshFilter>();
-                    collider = scatter.gameObject.AddComponent<MeshCollider>();
-                    collider.sharedMesh = CollisionMesh ? CollisionMesh : filter.sharedMesh;
-                    collider.enabled = true;
-                }
+                    MeshCollider collider = scatter.GetComponent<MeshCollider>();
+                    if (distance > max)
+                    {
+                        if (collider)
+                        {
+                            GameObject.Destroy(collider);
+                        }
+                    }
+                    else
+                    {
+                        if (collider)
+                        {
+                            continue;
+                        }
 
+                        MeshFilter filter = scatter.gameObject.GetComponent<MeshFilter>();
+                        collider = scatter.gameObject.AddComponent<MeshCollider>();
+                        collider.sharedMesh = CollisionMesh ? CollisionMesh : filter.sharedMesh;
+                        collider.enabled = true;
+                    }
+                }
             }
         }
 
