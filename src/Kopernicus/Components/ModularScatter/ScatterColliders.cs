@@ -54,11 +54,21 @@ namespace Kopernicus.Components.ModularScatter
         /// </summary>
         void IComponent<ModularScatter>.Update(ModularScatter system)
         {
-            float width = FlightGlobals.ActiveVessel.vesselSize.x;
-            float height = FlightGlobals.ActiveVessel.vesselSize.y;
-            float length = FlightGlobals.ActiveVessel.vesselSize.z;
+            float width = 0;
+            float height = 0;
+            float length = 0;
+            float max = 0;
+            float distance = 1000;
+            Boolean inFlight = false;
+            if (HighLogic.LoadedSceneIsFlight)
+            {
+                width = FlightGlobals.ActiveVessel.vesselSize.x;
+                height = FlightGlobals.ActiveVessel.vesselSize.y;
+                length = FlightGlobals.ActiveVessel.vesselSize.z;
+                max = Mathf.Max(width, height, length);
+                inFlight = true;
+            }
 
-            float max = Mathf.Max(width, height, length);
             PQSMod_LandClassScatterQuad[] quads = system.GetComponentsInChildren<PQSMod_LandClassScatterQuad>(true);
             for (Int32 i = 0; i < quads.Length; i++)
             {
@@ -69,7 +79,11 @@ namespace Kopernicus.Components.ModularScatter
                 }
                 scatterCount = surfaceObjects.Count();
                 KopernicusSurfaceObject scatter = surfaceObjects[i];
-                float distance = Vector3.Distance(FlightGlobals.ActiveVessel.transform.position, scatter.transform.position);
+                if (inFlight)
+                {
+                    distance = Vector3.Distance(FlightGlobals.ActiveVessel.transform.position, scatter.transform.position);
+                }
+
                 MeshCollider collider = scatter.GetComponent<MeshCollider>();
                 if (distance > max)
                 {
