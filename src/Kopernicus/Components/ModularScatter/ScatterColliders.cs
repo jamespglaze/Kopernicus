@@ -54,6 +54,11 @@ namespace Kopernicus.Components.ModularScatter
         /// </summary>
         void IComponent<ModularScatter>.Update(ModularScatter system)
         {
+            float width = FlightGlobals.ActiveVessel.vesselSize.x;
+            float height = FlightGlobals.ActiveVessel.vesselSize.y;
+            float length = FlightGlobals.ActiveVessel.vesselSize.z;
+
+            float max = Mathf.Max(width, height, length);
             PQSMod_LandClassScatterQuad[] quads = system.GetComponentsInChildren<PQSMod_LandClassScatterQuad>(true);
             for (Int32 i = 0; i < quads.Length; i++)
             {
@@ -62,19 +67,31 @@ namespace Kopernicus.Components.ModularScatter
                 {
                     return;
                 }
-
                 scatterCount = surfaceObjects.Count();
                 KopernicusSurfaceObject scatter = surfaceObjects[i];
-                MeshCollider collider = scatter.GetComponent<MeshCollider>();
-                if (collider)
+                float distance = Vector3.Distance(FlightGlobals.ActiveVessel.transform.position, scatter.transform.position);
+                if (distance > max)
                 {
-                    continue;
+                    MeshCollider collider = scatter.GetComponent<MeshCollider>();
+                    if (collider)
+                    {
+                        GameObject.DestroyImmediate(scatter.GetComponent<MeshCollider>());
+                    }
+                }
+                else
+                {
+                    MeshCollider collider = scatter.GetComponent<MeshCollider>();
+                    if (collider)
+                    {
+                        continue;
+                    }
+
+                    MeshFilter filter = scatter.gameObject.GetComponent<MeshFilter>();
+                    collider = scatter.gameObject.AddComponent<MeshCollider>();
+                    collider.sharedMesh = CollisionMesh ? CollisionMesh : filter.sharedMesh;
+                    collider.enabled = true;
                 }
 
-                MeshFilter filter = scatter.gameObject.GetComponent<MeshFilter>();
-                collider = scatter.gameObject.AddComponent<MeshCollider>();
-                collider.sharedMesh = CollisionMesh ? CollisionMesh : filter.sharedMesh;
-                collider.enabled = true;
             }
         }
 
