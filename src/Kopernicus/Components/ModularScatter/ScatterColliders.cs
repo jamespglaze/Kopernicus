@@ -70,13 +70,16 @@ namespace Kopernicus.Components.ModularScatter
                 scatterCount = surfaceObjects.Count();
                 KopernicusSurfaceObject scatter = surfaceObjects[i];
                 float distance = Vector3.Distance(FlightGlobals.ActiveVessel.transform.position, scatter.transform.position);
+                MeshCollider collider = scatter.GetComponent<MeshCollider>();
                 if (distance > max)
                 {
-                    GameObject.Destroy(scatter.GetComponent<MeshCollider>());
+                    if (collider)
+                    {
+                        GameObject.Destroy(collider);
+                    }
                 }
                 else
                 {
-                    MeshCollider collider = scatter.GetComponent<MeshCollider>();
                     if (collider)
                     {
                         continue;
