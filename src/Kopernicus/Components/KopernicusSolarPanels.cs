@@ -75,15 +75,15 @@ namespace Kopernicus.Components
                 if (SP?.deployState == ModuleDeployablePart.DeployState.EXTENDED)
                 {
                     Vector3 normalized = (SP.trackingTransformLocal.position - SP.panelRotationTransform.position).normalized;
-                    LatePostCalculateTracking(SP, normalized);
+                    FieldInfo trackingLOS = typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "trackingLOS");
+                    LatePostCalculateTracking((bool)trackingLOS.GetValue(SP), normalized,n);
                 }
             }
         }
 
-        public void LatePostCalculateTracking(ModuleDeployableSolarPanel SP, Vector3 trackingDirection)
+        public void LatePostCalculateTracking(Boolean trackingLos, Vector3 trackingDirection, int panelId)
         {
-            FieldInfo trackingLOS = typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "trackingLOS");
-            Boolean trackingLos = (bool)trackingLOS.GetValue(SP);
+            ModuleDeployableSolarPanel SP = SPs[panelId];
 
             // Maximum values
             Double maxEnergy = 0;
