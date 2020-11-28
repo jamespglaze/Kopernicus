@@ -75,169 +75,166 @@ namespace Kopernicus.Components
                 if (SP?.deployState == ModuleDeployablePart.DeployState.EXTENDED)
                 {
                     Vector3 normalized = (SP.trackingTransformLocal.position - SP.panelRotationTransform.position).normalized;
-                    FieldInfo trackingLOS = typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "trackingLOS");
-                    LatePostCalculateTracking((bool)trackingLOS.GetValue(SP), normalized);
+                    LatePostCalculateTracking(SP, normalized);
                 }
             }
         }
 
-        public void LatePostCalculateTracking(Boolean trackingLos, Vector3 trackingDirection)
+        public void LatePostCalculateTracking(ModuleDeployableSolarPanel SP, Vector3 trackingDirection)
         {
-            for (Int32 n = SPs.Length; n > 0; n--)
+            FieldInfo trackingLOS = typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "trackingLOS");
+            Boolean trackingLos = (bool)trackingLOS.GetValue(SP);
+
+            // Maximum values
+            Double maxEnergy = 0;
+            KopernicusStar maxStar = null;
+
+            // Override layer mask
+            typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "planetLayerMask").SetValue(SP, ModularFlightIntegrator.SunLayerMask);
+
+            // Efficiency modifier
+            SP._efficMult = SP.temperatureEfficCurve.Evaluate((Single)part.skinTemperature) *
+                         SP.timeEfficCurve.Evaluate(
+                             (Single)((Planetarium.GetUniversalTime() - SP.launchUT) * 1.15740740740741E-05)) *
+                        SP.efficiencyMult;
+            SP._flowRate = 0;
+            SP.sunAOA = 0;
+
+            // Go through all stars
+            Int32 stars = KopernicusStar.Stars.Count;
+            for (Int32 i = 0; i < stars; i++)
             {
-                ModuleDeployableSolarPanel SP = SPs[n - 1];
+                KopernicusStar star = KopernicusStar.Stars[i];
 
-                // Maximum values
-                Double maxEnergy = 0;
-                KopernicusStar maxStar = null;
+                // Calculate stuff
+                Transform sunTransform = star.sun.transform;
+                Vector3 trackDir = (sunTransform.position - SP.panelRotationTransform.position).normalized;
+                CelestialBody old = SP.trackingBody;
+                SP.trackingTransformLocal = sunTransform;
+                SP.trackingTransformScaled = star.sun.scaledBody.transform;
 
-                // Override layer mask
-                typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "planetLayerMask").SetValue(SP, ModularFlightIntegrator.SunLayerMask);
+                FieldInfo blockingObject = typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "blockingObject");
+                string blockingObjectName = (string)blockingObject.GetValue(SP);
+                trackingLos = SP.CalculateTrackingLOS(trackDir, ref blockingObjectName);
+                blockingObject.SetValue(SP, blockingObjectName);
 
-                // Efficiency modifier
-                SP._efficMult = SP.temperatureEfficCurve.Evaluate((Single)part.skinTemperature) *
-                             SP.timeEfficCurve.Evaluate(
-                                 (Single)((Planetarium.GetUniversalTime() - SP.launchUT) * 1.15740740740741E-05)) *
-                            SP.efficiencyMult;
-                SP._flowRate = 0;
-                SP.sunAOA = 0;
+                SP.trackingTransformLocal = old.transform;
+                SP.trackingTransformScaled = old.scaledBody.transform;
 
-                // Go through all stars
-                Int32 stars = KopernicusStar.Stars.Count;
-                for (Int32 i = 0; i < stars; i++)
+                // Calculate sun AOA
+                Single sunAoa;
+                if (!trackingLos)
                 {
-                    KopernicusStar star = KopernicusStar.Stars[i];
-
-                    // Calculate stuff
-                    Transform sunTransform = star.sun.transform;
-                    Vector3 trackDir = (sunTransform.position - SP.panelRotationTransform.position).normalized;
-                    CelestialBody old = SP.trackingBody;
-                    SP.trackingTransformLocal = sunTransform;
-                    SP.trackingTransformScaled = star.sun.scaledBody.transform;
-
-                    FieldInfo blockingObject = typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "blockingObject");
-                    string blockingObjectName = (string)blockingObject.GetValue(SP);
-                    trackingLos = SP.CalculateTrackingLOS(trackDir, ref blockingObjectName);
-                    blockingObject.SetValue(SP, blockingObjectName);
-
-                    SP.trackingTransformLocal = old.transform;
-                    SP.trackingTransformScaled = old.scaledBody.transform;
-
-                    // Calculate sun AOA
-                    Single sunAoa;
-                    if (!trackingLos)
+                    sunAoa = 0f;
+                    SP.status = Localizer.Format("#Kopernicus_UI_PanelBlocked", blockingObjectName);//"Blocked by " + blockingObjectName
+                }
+                else
+                {
+                    SP.status = SP_status_DirectSunlight;//"Direct Sunlight"
+                    if (SP.panelType == ModuleDeployableSolarPanel.PanelType.FLAT)
                     {
-                        sunAoa = 0f;
-                        SP.status = Localizer.Format("#Kopernicus_UI_PanelBlocked", blockingObjectName);//"Blocked by " + blockingObjectName
+                        sunAoa = Mathf.Clamp(Vector3.Dot(SP.trackingDotTransform.forward, trackDir), 0f, 1f);
+                    }
+                    else if (SP.panelType != ModuleDeployableSolarPanel.PanelType.CYLINDRICAL)
+                    {
+                        sunAoa = 0.25f;
                     }
                     else
                     {
-                        SP.status = SP_status_DirectSunlight;//"Direct Sunlight"
-                        if (SP.panelType == ModuleDeployableSolarPanel.PanelType.FLAT)
+                        Vector3 direction;
+                        if (SP.alignType == ModuleDeployableSolarPanel.PanelAlignType.PIVOT)
                         {
-                            sunAoa = Mathf.Clamp(Vector3.Dot(SP.trackingDotTransform.forward, trackDir), 0f, 1f);
+                            direction = SP.trackingDotTransform.forward;
                         }
-                        else if (SP.panelType != ModuleDeployableSolarPanel.PanelType.CYLINDRICAL)
+                        else if (SP.alignType != ModuleDeployableSolarPanel.PanelAlignType.X)
                         {
-                            sunAoa = 0.25f;
+                            direction = SP.alignType != ModuleDeployableSolarPanel.PanelAlignType.Y
+                                ? part.partTransform.forward
+                                : part.partTransform.up;
                         }
                         else
                         {
-                            Vector3 direction;
-                            if (SP.alignType == ModuleDeployableSolarPanel.PanelAlignType.PIVOT)
-                            {
-                                direction = SP.trackingDotTransform.forward;
-                            }
-                            else if (SP.alignType != ModuleDeployableSolarPanel.PanelAlignType.X)
-                            {
-                                direction = SP.alignType != ModuleDeployableSolarPanel.PanelAlignType.Y
-                                    ? part.partTransform.forward
-                                    : part.partTransform.up;
-                            }
-                            else
-                            {
-                                direction = part.partTransform.right;
-                            }
-
-                            sunAoa = (1f - Mathf.Abs(Vector3.Dot(direction, trackDir))) * 0.318309873f;
+                            direction = part.partTransform.right;
                         }
+
+                        sunAoa = (1f - Mathf.Abs(Vector3.Dot(direction, trackDir))) * 0.318309873f;
+                    }
+                }
+
+                // Calculate distance multiplier
+                Double distMult;
+                if (!SP.useCurve)
+                {
+                    if (!KopernicusStar.SolarFlux.ContainsKey(star.name))
+                    {
+                        continue;
                     }
 
-                    // Calculate distance multiplier
-                    Double distMult;
-                    if (!SP.useCurve)
-                    {
-                        if (!KopernicusStar.SolarFlux.ContainsKey(star.name))
-                        {
-                            continue;
-                        }
+                    distMult = (Single)(KopernicusStar.SolarFlux[star.name] / StockLuminosity);
+                }
+                else
+                {
+                    distMult =
+                     SP.powerCurve.Evaluate((star.sun.transform.position - SP.panelRotationTransform.position).magnitude);
+                }
 
-                        distMult = (Single)(KopernicusStar.SolarFlux[star.name] / StockLuminosity);
+                // Calculate flow rate
+                Double panelFlowRate = sunAoa * SP._efficMult * distMult;
+                if (part.submergedPortion > 0)
+                {
+                    Double altitudeAtPos =
+                        -FlightGlobals.getAltitudeAtPos
+                        (
+                            (Vector3d)(((Transform)typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "secondaryTransform").GetValue(SP)).position),
+                            vessel.mainBody
+                        );
+                    altitudeAtPos = (altitudeAtPos * 3 + part.maxDepth) * 0.25;
+                    if (altitudeAtPos < 0.5)
+                    {
+                        altitudeAtPos = 0.5;
+                    }
+
+                    Double num = 1 / (1 + altitudeAtPos * part.vessel.mainBody.oceanDensity);
+                    if (part.submergedPortion >= 1)
+                    {
+                        panelFlowRate *= num;
                     }
                     else
                     {
-                        distMult =
-                         SP.powerCurve.Evaluate((star.sun.transform.position - SP.panelRotationTransform.position).magnitude);
+                        panelFlowRate *= UtilMath.LerpUnclamped(1, num, part.submergedPortion);
                     }
 
-                    // Calculate flow rate
-                    Double panelFlowRate = sunAoa * SP._efficMult * distMult;
-                    if (part.submergedPortion > 0)
-                    {
-                        Double altitudeAtPos =
-                            -FlightGlobals.getAltitudeAtPos
-                            (
-                                (Vector3d)(((Transform)typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "secondaryTransform").GetValue(SP)).position),
-                                vessel.mainBody
-                            );
-                        altitudeAtPos = (altitudeAtPos * 3 + part.maxDepth) * 0.25;
-                        if (altitudeAtPos < 0.5)
-                        {
-                            altitudeAtPos = 0.5;
-                        }
-
-                        Double num = 1 / (1 + altitudeAtPos * part.vessel.mainBody.oceanDensity);
-                        if (part.submergedPortion >= 1)
-                        {
-                            panelFlowRate *= num;
-                        }
-                        else
-                        {
-                            panelFlowRate *= UtilMath.LerpUnclamped(1, num, part.submergedPortion);
-                        }
-
-                        SP.status += ", " + SP_status_Underwater;//Underwater
-                    }
-
-                    SP.sunAOA += sunAoa;
-                    Double energy = distMult * SP._efficMult;
-                    if (energy > maxEnergy)
-                    {
-                        maxEnergy = energy;
-                        maxStar = star;
-                    }
-
-                    // Apply the flow rate
-                    SP._flowRate += panelFlowRate;
+                    SP.status += ", " + SP_status_Underwater;//Underwater
                 }
 
-                // Sun AOA
-                SP.sunAOA /= _relativeSunAoa ? stars : 1;
-                SP._distMult = Math.Abs(SP._flowRate) > 0.01 ? SP._flowRate / SP._efficMult / SP.sunAOA : 0;
-
-                // We got the best star to use
-                if (maxStar != null && maxStar.sun != SP.trackingBody)
+                SP.sunAOA += sunAoa;
+                Double energy = distMult * SP._efficMult;
+                if (energy > maxEnergy)
                 {
-                    if (!_manualTracking)
-                    {
-                        SP.trackingBody = maxStar.sun;
-                        SP.GetTrackingBodyTransforms();
-                    }
+                    maxEnergy = energy;
+                    maxStar = star;
                 }
 
-                // Use the flow rate
-                SP.flowRate = (Single)(SP.resHandler.UpdateModuleResourceOutputs(SP._flowRate) * SP.flowMult);
+                // Apply the flow rate
+                SP._flowRate += panelFlowRate;
             }
+
+            // Sun AOA
+            SP.sunAOA /= _relativeSunAoa ? stars : 1;
+            SP._distMult = Math.Abs(SP._flowRate) > 0.01 ? SP._flowRate / SP._efficMult / SP.sunAOA : 0;
+
+            // We got the best star to use
+            if (maxStar != null && maxStar.sun != SP.trackingBody)
+            {
+                if (!_manualTracking)
+                {
+                    SP.trackingBody = maxStar.sun;
+                    SP.GetTrackingBodyTransforms();
+                }
+            }
+
+            // Use the flow rate
+            SP.flowRate = (Single)(SP.resHandler.UpdateModuleResourceOutputs(SP._flowRate) * SP.flowMult);
         }
 
         public void EarlyLateUpdate()
