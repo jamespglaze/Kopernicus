@@ -37,6 +37,9 @@
       <HintPath>C:\Program Files\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
     <Reference Include="Kopernicus.Parser">
       <HintPath>C:\Program Files\Kerbal Space Program\GameData\Kopernicus\Plugins\Kopernicus.Parser.dll</HintPath>
     </Reference>
@@ -46,6 +49,11 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>C:\Program Files\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
       <Private>False</Private>
@@ -77,10 +85,26 @@
   <ItemGroup>
     <Compile Include="Components\DrawTools.cs" />
     <Compile Include="Components\HazardousBody.cs" />
+    <Compile Include="Components\KERBALISMLITE\Background.cs" />
+    <Compile Include="Components\KERBALISMLITE\Cache.cs" />
+    <Compile Include="Components\KERBALISMLITE\Database\DB.cs" />
+    <Compile Include="Components\KERBALISMLITE\Database\PartData.cs" />
+    <Compile Include="Components\KERBALISMLITE\Database\ResourceUpdateDelegate.cs" />
+    <Compile Include="Components\KERBALISMLITE\Database\SupplyData.cs" />
+    <Compile Include="Components\KERBALISMLITE\Database\VesselData.cs" />
+    <Compile Include="Components\KERBALISMLITE\DeviceEC.cs" />
+    <Compile Include="Components\KERBALISMLITE\GlobalSuppressions.cs" />
+    <Compile Include="Components\KERBALISMLITE\Lib.cs" />
+    <Compile Include="Components\KERBALISMLITE\LocalizationCache.cs" />
+    <Compile Include="Components\KERBALISMLITE\Modules\IKerbalismLiteModule.cs" />
+    <Compile Include="Components\KERBALISMLITE\Modules\KopernicusSolarPanels.cs" />
+    <Compile Include="Components\KERBALISMLITE\Resource.cs" />
+    <Compile Include="Components\KERBALISMLITE\Sim.cs" />
+    <Compile Include="Components\KERBALISMLITE\System\Kerbalism.cs" />
+    <Compile Include="Components\KERBALISMLITE\Utility\Serenity.cs" />
     <Compile Include="Components\KopernicusHeatManager.cs" />
     <Compile Include="Components\KopernicusOrbitRendererData.cs" />
     <Compile Include="Components\KopernicusSimplexWrapper.cs" />
-    <Compile Include="Components\KopernicusSolarPanels.cs" />
     <Compile Include="Components\KopernicusStar.cs" />
     <Compile Include="Components\KopernicusSunFlare.cs" />
     <Compile Include="Components\KopernicusSurfaceObject.cs" />
@@ -333,6 +357,9 @@
     <Compile Include="UI\PlanetTextureExporter.cs" />
     <Compile Include="UI\Tools.cs" />
     <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Components\KERBALISMLITE\.ksplocalizer.settings" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
