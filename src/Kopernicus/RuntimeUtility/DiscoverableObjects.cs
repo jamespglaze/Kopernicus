@@ -229,7 +229,7 @@ namespace Kopernicus.RuntimeUtility
 
             // Spawn
             ConfigNode vessel = null;
-#if KSP_VERSION_1_10_1
+#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
             if (Random.Range(0, 100) > RuntimeUtility.KopernicusConfig.CometPercentage)
             {
 #endif
@@ -253,7 +253,7 @@ namespace Kopernicus.RuntimeUtility
                         maxLifetime
                     )
                 );
-#if KSP_VERSION_1_10_1
+#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
             }
             else
             {

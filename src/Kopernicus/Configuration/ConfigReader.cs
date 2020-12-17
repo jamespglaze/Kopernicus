@@ -44,7 +44,7 @@ namespace Kopernicus.Configuration
 		public int EnforcedShaderLevel = 2;
 		[Persistent]
 		public int ScatterCullDistance = 10000;
-#if KSP_VERSION_1_10_1
+#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
 		[Persistent]
 		public int CometPercentage = 25;
 #endif
