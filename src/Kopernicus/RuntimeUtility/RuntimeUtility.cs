@@ -478,6 +478,7 @@ namespace Kopernicus.RuntimeUtility
         // Fix the Zooming-Out bug
         private void FixZooming()
         {
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1)
             if (HighLogic.LoadedSceneHasPlanetarium && MapView.fetch && !_fixZoomingIsDone)
             {
                 // Fix the bug via switching away from Home and back immediately.
@@ -494,6 +495,7 @@ namespace Kopernicus.RuntimeUtility
                 // Terminate for the moment.
                 _fixZoomingIsDone = true;
             }
+#endif
 
             // Set custom Zoom-In limits
             if (HighLogic.LoadedScene != GameScenes.TRACKSTATION && !MapView.MapIsEnabled)
@@ -653,7 +655,6 @@ namespace Kopernicus.RuntimeUtility
             PlanetariumCamera.Camera.farClipPlane = 1e14f;
 #endif
         }
-
         // Whether to apply the customizations next frame
         private Boolean _orbitIconsReady;
 
