@@ -253,8 +253,20 @@ namespace Kopernicus.RuntimeUtility
                         maxLifetime
                     )
                 );
-#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+                OverrideNode(ref vessel, asteroid.Vessel);
+                ProtoVessel protoVessel = new ProtoVessel(vessel, HighLogic.CurrentGame);
+                if (asteroid.UniqueName && FlightGlobals.Vessels.Count(v => v.vesselName == protoVessel.vesselName) != 0)
+                {
+                    return;
+                }
+
+                Kopernicus.Events.OnRuntimeUtilitySpawnAsteroid.Fire(asteroid, protoVessel);
+                protoVessel.Load(HighLogic.CurrentGame.flightState);
+                GameEvents.onNewVesselCreated.Fire(protoVessel.vesselRef);
+                GameEvents.onAsteroidSpawned.Fire(protoVessel.vesselRef);
+                Debug.Log("[Kopernicus] New object found near " + body.name + ": " + protoVessel.vesselName + "!");
             }
+#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
             else
             {
             float fragmentDynamicPressureModifier = 0f;
@@ -274,19 +286,22 @@ namespace Kopernicus.RuntimeUtility
                 {
             configNode2
                 }, new ConfigNode("ACTIONGROUPS"), ProtoVessel.CreateDiscoveryNode(DiscoveryLevels.Presence, randomObjClass, lifetime, maxLifetime), configNode3);
-            }
-            OverrideNode(ref vessel, asteroid.Vessel);
-            ProtoVessel protoVessel = new ProtoVessel(vessel, HighLogic.CurrentGame);
-            if (asteroid.UniqueName && FlightGlobals.Vessels.Count(v => v.vesselName == protoVessel.vesselName) != 0)
-            {
-                return;
-            }
+                OverrideNode(ref vessel, asteroid.Vessel);
+                ProtoVessel protoVessel = new ProtoVessel(vessel, HighLogic.CurrentGame);
+                try
+                {
+                    Kopernicus.Events.OnRuntimeUtilitySpawnAsteroid.Fire(asteroid, protoVessel);
+                    GameEvents.onNewVesselCreated.Fire(protoVessel.vesselRef);
+                    GameEvents.onAsteroidSpawned.Fire(protoVessel.vesselRef);
+                }
+                catch
+                {
+                    //I don't know why this is needed.
+                }
+                protoVessel.Load(HighLogic.CurrentGame.flightState);
 
-            Kopernicus.Events.OnRuntimeUtilitySpawnAsteroid.Fire(asteroid, protoVessel);
-            protoVessel.Load(HighLogic.CurrentGame.flightState);
-            GameEvents.onNewVesselCreated.Fire(protoVessel.vesselRef);
-            GameEvents.onAsteroidSpawned.Fire(protoVessel.vesselRef);
-            Debug.Log("[Kopernicus] New object found near " + body.name + ": " + protoVessel.vesselName + "!");
+                Debug.Log("[Kopernicus] New object found near " + body.name + ": " + protoVessel.vesselName + "!");
+            }
 #endif
         }
 
