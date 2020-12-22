@@ -265,8 +265,8 @@ namespace Kopernicus.RuntimeUtility
                 GameEvents.onNewVesselCreated.Fire(protoVessel.vesselRef);
                 GameEvents.onAsteroidSpawned.Fire(protoVessel.vesselRef);
                 Debug.Log("[Kopernicus] New object found near " + body.name + ": " + protoVessel.vesselName + "!");
-            }
 #if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+            }
             else
             {
             float fragmentDynamicPressureModifier = 0f;
