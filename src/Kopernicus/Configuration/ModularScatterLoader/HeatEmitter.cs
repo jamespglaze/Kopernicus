@@ -24,6 +24,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Kopernicus.Components.ModularScatter;
 using Kopernicus.ConfigParser.Attributes;
@@ -41,31 +42,76 @@ namespace Kopernicus.Configuration.ModularScatterLoader
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class HeatEmitter : ComponentLoader<ModularScatter, HeatEmitterComponent>
     {
-        // The average heat emitted by the scatter
-        [ParserTarget("heat")]
-        [KittopiaDescription("The average heat emitted by the scatter.")]
-        public NumericParser<Double> Heat
+        // The ambient temperature.
+        [ParserTarget("temperature")]
+        [KittopiaDescription("The ambient temperature.")]
+        public NumericParser<Double> AmbientTemp
         {
-            get { return Value.HeatRate; }
-            set { Value.HeatRate = value; }
+            get { return Value.ambientTemp; }
+            set { Value.ambientTemp = value; }
         }
 
-        // How many seconds pass between applying the heat to a vessel
-        [ParserTarget("interval")]
-        [KittopiaDescription("How many seconds pass between applying the heat to a vessel.")]
-        public NumericParser<Double> Interval
+        // If the ambientTemp should be added.
+        [ParserTarget("sumTemp")]
+        [KittopiaDescription("If the ambientTemp should be added.")]
+        public NumericParser<Boolean> SumTemp
         {
-            get { return Value.HeatInterval; }
-            set { Value.HeatInterval = value; }
+            get { return Value.sumTemp; }
+            set { Value.sumTemp = value; }
         }
 
-        // Controls the how much of the average heat gets applied at a certain distance
-        [ParserTarget("DistanceCurve")]
-        [KittopiaDescription("Controls the how much of the average heat gets applied at a certain distance.")]
-        public FloatCurveParser DistanceCurve
+        // The name of the biome.
+        [ParserTarget("biomeName")]
+        [KittopiaDescription("The name of the biome.")]
+        public String BiomeName
         {
-            get { return Value.HeatCurve; }
-            set { Value.HeatCurve = value; }
+            get { return Value.biomeName; }
+            set { Value.biomeName = value; }
+        }
+
+        // Multiplier curve to change ambientTemp with altitude
+        [ParserTargetCollection("AltitudeCurve", Key = "key", NameSignificance = NameSignificance.Key)]
+        [KittopiaDescription("Multiplier curve to change ambientTemp with altitude.")]
+        public List<NumericCollectionParser<Single>> AltitudeCurve
+        {
+            get { return Utility.FloatCurveToList(Value.altitudeCurve); }
+            set { Value.altitudeCurve = Utility.ListToFloatCurve(value); }
+        }
+
+        // Multiplier curve to change ambientTemp with latitude
+        [ParserTargetCollection("LatitudeCurve", Key = "key", NameSignificance = NameSignificance.Key)]
+        [KittopiaDescription("Multiplier curve to change ambientTemp with latitude.")]
+        public List<NumericCollectionParser<Single>> LatitudeCurve
+        {
+            get { return Utility.FloatCurveToList(Value.latitudeCurve); }
+            set { Value.latitudeCurve = Utility.ListToFloatCurve(value); }
+        }
+
+        // Multiplier curve to change ambientTemp with longitude
+        [ParserTargetCollection("LongitudeCurve", Key = "key", NameSignificance = NameSignificance.Key)]
+        [KittopiaDescription("Multiplier curve to change ambientTemp with longitude.")]
+        public List<NumericCollectionParser<Single>> LongitudeCurve
+        {
+            get { return Utility.FloatCurveToList(Value.longitudeCurve); }
+            set { Value.longitudeCurve = Utility.ListToFloatCurve(value); }
+        }
+
+        // Multiplier curve to change ambientTemp with distance
+        [ParserTargetCollection("DistanceCurve", Key = "key", NameSignificance = NameSignificance.Key)]
+        [KittopiaDescription("Multiplier curve to change ambientTemp with distance.")]
+        public List<NumericCollectionParser<Single>> DistanceCurve
+        {
+            get { return Utility.FloatCurveToList(Value.distanceCurve); }
+            set { Value.distanceCurve = Utility.ListToFloatCurve(value); }
+        }
+
+        // Multiplier map for ambientTemp
+        [ParserTarget("HeatMap")]
+        [KittopiaDescription("Greyscale map for fine control of the ambientTemp on a planet. black = 0, white = 1")]
+        public MapSOParserGreyScale<MapSO> HeatMap
+        {
+            get { return Value.heatMap; }
+            set { Value.heatMap = value; }
         }
     }
 }
