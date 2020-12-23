@@ -287,8 +287,6 @@ namespace Kopernicus
         public static EventData<KSC> OnSwitchKSC { get; private set; }
         [Description("Components.ApplyNameChange")]
         public static EventData<NameChanger, CelestialBody> OnApplyNameChange { get; private set; }
-        [Description("Components.KopernicusHeatManager")]
-        public static EventData<ModularFlightIntegrator> OnCalculateBackgroundRadiationTemperature { get; set; }
 
         [Description("Components.SwitchKSC.NR")]
         private static EventVoid OnSwitchKSCNR { get; set; }
