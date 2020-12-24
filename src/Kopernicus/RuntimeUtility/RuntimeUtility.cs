@@ -761,11 +761,15 @@ namespace Kopernicus.RuntimeUtility
         {
             if (HighLogic.LoadedScene != GameScenes.SPACECENTER)
             {
+
+                Events.OnRuntimeUtilityPatchFI.Fire();
+                ModularFlightIntegrator.RegisterCalculateSunBodyFluxOverride(KopernicusStar.SunBodyFlux);
+                ModularFlightIntegrator.RegisterCalculateBackgroundRadiationTemperatureOverride(KopernicusHeatManager.RadiationTemperature);
+            }
+            else
+            {
                 return;
             }
-            Events.OnRuntimeUtilityPatchFI.Fire();
-            ModularFlightIntegrator.RegisterCalculateSunBodyFluxOverride(KopernicusStar.SunBodyFlux);
-            ModularFlightIntegrator.RegisterCalculateBackgroundRadiationTemperatureOverride(KopernicusHeatManager.RadiationTemperature);
         }
 
         // Fix the Space Center Cameras
