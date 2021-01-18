@@ -10,39 +10,49 @@ namespace Kopernicus.Components.ModularScatter
     [RequireComponent(typeof(MeshRenderer))]
     class ScatterDistanceCuller : MonoBehaviour
     {
+        private Boolean init = false;
+        private int counter = 0;
         private MeshRenderer surfaceObject;
+        private int maxdistance = 1;
         private void Start()
         {
-            surfaceObject = GetComponent<MeshRenderer>();
+
         }
         private void Update()
         {
-            int maxdistance = Kopernicus.RuntimeUtility.RuntimeUtility.KopernicusConfig.ScatterCullDistance;
-            int distance = 15000;
-            if (HighLogic.LoadedSceneIsFlight)
+            //Rate Limit it to doing a cull-calculation every 60 frames, which should be plenty.  These are very heavy.
+            counter++;
+            if (counter > 60)
             {
-                try
+                if (!init)
                 {
-                    distance = (int)Vector3.Distance(FlightGlobals.ActiveVessel.transform.position, surfaceObject.transform.position);
+                    init = true;
+                    maxdistance = Kopernicus.RuntimeUtility.RuntimeUtility.KopernicusConfig.ScatterCullDistance;
+                    surfaceObject = GetComponent<MeshRenderer>();
                 }
-                catch
+                counter = 0;
+                int distance = 15000;
+                if (HighLogic.LoadedSceneIsFlight)
                 {
                     distance = (int)Vector3.Distance(Camera.current.transform.position, surfaceObject.transform.position);
-                    //If craft breaks up this prevents errors.
+                }
+                else
+                {
+                    distance = 0;
+                }
+
+                if (distance > maxdistance)
+                {
+                    surfaceObject.enabled = false;
+                }
+                else
+                {
+                    surfaceObject.enabled = true;
                 }
             }
             else
             {
-                distance = 0;
-            }
-
-            if (distance > maxdistance)
-            {
-                surfaceObject.enabled = false;
-            }
-            else
-            {
-                surfaceObject.enabled = true;
+                return;
             }
         }
     }
