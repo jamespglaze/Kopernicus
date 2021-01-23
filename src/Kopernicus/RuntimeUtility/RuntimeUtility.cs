@@ -445,12 +445,9 @@ namespace Kopernicus.RuntimeUtility
                    continue;
                 }
        
-                Double rotPeriod = Utility
-                    .FindBody(PSystemManager.Instance.systemPrefab.rootBody, body.transform.name).celestialBody
-                    .rotationPeriod;
-                Double num1 = Math.PI * 2 * Math.Sqrt(Math.Pow(Math.Abs(body.orbit.semiMajorAxis), 3) /
-                                                      body.orbit.referenceBody.gravParameter);
-                body.rotationPeriod = rotPeriod * num1 / (num1 + rotPeriod);
+                Double rotationPeriod = body.rotationPeriod;
+                Double orbitalPeriod = body.orbit.period;
+                body.rotationPeriod = rotationPeriod * orbitalPeriod / (orbitalPeriod + rotationPeriod);
             }
 
             // Update the order in the tracking station
