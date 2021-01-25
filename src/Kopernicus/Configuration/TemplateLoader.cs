@@ -201,7 +201,7 @@ namespace Kopernicus.Configuration
                     Body.pqsVersion.surfaceMaterial = surfaceMaterial;
                 }
 #endif
-                else if (GameSettings.TERRAIN_SHADER_QUALITY == 2)
+                if (GameSettings.TERRAIN_SHADER_QUALITY == 2)
                 {
                     Material surfaceMaterial = Body.pqsVersion.highQualitySurfaceMaterial;
 
@@ -307,7 +307,7 @@ namespace Kopernicus.Configuration
                         ocean.surfaceMaterial = surfaceMaterial;
                     }
 #endif
-                    else if (GameSettings.TERRAIN_SHADER_QUALITY == 2)
+                    if (GameSettings.TERRAIN_SHADER_QUALITY == 2)
                     {
                         Material surfaceMaterial = ocean.highQualitySurfaceMaterial;
 
