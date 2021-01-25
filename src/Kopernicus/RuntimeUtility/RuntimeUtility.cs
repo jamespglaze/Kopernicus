@@ -160,6 +160,7 @@ namespace Kopernicus.RuntimeUtility
                 }
             }
         }
+		
         // Stuff
         private void LateUpdate()
         {
@@ -242,7 +243,6 @@ namespace Kopernicus.RuntimeUtility
             }
             orbit.SetValue("REF", body.flightGlobalsIndex);
         }
-
 
         // Transforms body references in the save games
         private static void TransformBodyReferencesOnSave(GameEvents.FromToAction<ProtoVessel, ConfigNode> data)
