@@ -141,6 +141,25 @@ namespace Kopernicus.RuntimeUtility
             }
         }
 
+        private void Update()
+        {
+            PatchColliders();
+        }
+
+        //Collision physics patcher
+        public static void PatchColliders()
+        {
+            if (HighLogic.LoadedSceneIsFlight && (CameraManager.GetCurrentCamera().cameraType == CameraType.Game))
+            {
+                if (FlightGlobals.ActiveVessel != null)
+                {
+                    CollisionEnhancer.bypass = false;
+                    CollisionEnhancer.UnderTerrainTolerance = 0;
+                    FlightGlobals.ActiveVessel.ResetCollisionIgnores();
+
+                }
+            }
+        }
         // Stuff
         private void LateUpdate()
         {
@@ -159,11 +178,11 @@ namespace Kopernicus.RuntimeUtility
                 AtmosphereLightPatch(PSystemManager.Instance.localBodies[i]);
             }
         }
-
         // Run patches every time a new scene was loaded
         [SuppressMessage("ReSharper", "Unity.IncorrectMethodSignature")]
         private void OnLevelWasLoaded(GameScenes scene)
         {
+            PatchColliders();
             PatchFlightIntegrator();
             FixCameras();
             PatchTimeOfDayAnimation();
@@ -223,6 +242,7 @@ namespace Kopernicus.RuntimeUtility
             }
             orbit.SetValue("REF", body.flightGlobalsIndex);
         }
+
 
         // Transforms body references in the save games
         private static void TransformBodyReferencesOnSave(GameEvents.FromToAction<ProtoVessel, ConfigNode> data)
@@ -756,17 +776,13 @@ namespace Kopernicus.RuntimeUtility
         // Patch FlightIntegrator
         private static void PatchFlightIntegrator()
         {
-            if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-            {
-
-                Events.OnRuntimeUtilityPatchFI.Fire();
-                ModularFlightIntegrator.RegisterCalculateSunBodyFluxOverride(KopernicusStar.SunBodyFlux);
-                ModularFlightIntegrator.RegisterCalculateBackgroundRadiationTemperatureOverride(KopernicusHeatManager.RadiationTemperature);
-            }
-            else
+            if (HighLogic.LoadedScene != GameScenes.SPACECENTER)
             {
                 return;
             }
+            Events.OnRuntimeUtilityPatchFI.Fire();
+            ModularFlightIntegrator.RegisterCalculateSunBodyFluxOverride(KopernicusStar.SunBodyFlux);
+            ModularFlightIntegrator.RegisterCalculateBackgroundRadiationTemperatureOverride(KopernicusHeatManager.RadiationTemperature);
         }
 
         // Fix the Space Center Cameras
