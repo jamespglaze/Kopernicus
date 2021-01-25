@@ -282,7 +282,7 @@ namespace Kopernicus.Configuration
                     if (GameSettings.TERRAIN_SHADER_QUALITY == 3)
                     {
 
-                        Material surfaceMaterial = Body.pqsVersion.ultraQualitySurfaceMaterial;
+                        Material surfaceMaterial = ocean.ultraQualitySurfaceMaterial;
 
                         if (!surfaceMaterial)
                         {
