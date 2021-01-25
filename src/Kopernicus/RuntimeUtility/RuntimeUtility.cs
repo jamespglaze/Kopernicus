@@ -51,6 +51,7 @@ namespace Kopernicus.RuntimeUtility
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class RuntimeUtility : MonoBehaviour
     {
+        public static int physicsCorrectionCounter = 0;
         public static ConfigReader KopernicusConfig = new Kopernicus.Configuration.ConfigReader();
         // Awake() - flag this class as don't destroy on load and register delegates
         [SuppressMessage("ReSharper", "ConvertClosureToMethodGroup")]
@@ -143,7 +144,12 @@ namespace Kopernicus.RuntimeUtility
 
         private void Update()
         {
-            PatchColliders();
+            physicsCorrectionCounter++;
+            if (physicsCorrectionCounter > 60)
+            {
+                PatchColliders();
+                physicsCorrectionCounter = 0;
+            }
         }
 
         //Collision physics patcher
