@@ -31,6 +31,7 @@ using UnityEngine;
 
 namespace Kopernicus.Configuration.ModLoader
 {
+    #if (!KSP_VERSION_1_8_1)
     [RequireConfigType(ConfigType.Node)]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class TextureAtlas : ModLoader<PQSMod_TextureAtlas>
@@ -88,5 +89,6 @@ namespace Kopernicus.Configuration.ModLoader
             }
         }
     }
+#endif
 }
 

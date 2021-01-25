@@ -22,18 +22,18 @@
 *
 * https://kerbalspaceprogram.com
 */
-
+#if (!KSP_VERSION_1_8_1)
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Kopernicus.Components.MaterialWrapper;
 using UnityEngine;
-
 namespace Kopernicus.Components
 {
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class PQSMod_TextureAtlasFixer : PQSMod
     {
+
         private PQSMod_TextureAtlas[] _mods;
 
         private static readonly Int32 NormalTex = Shader.PropertyToID("_NormalTex");
@@ -99,3 +99,4 @@ namespace Kopernicus.Components
         }
     }
 }
+#endif

@@ -665,7 +665,7 @@ namespace Kopernicus.RuntimeUtility
 
         private static void FixFlickeringOrbitLines()
         {
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1)
+#if ((KSP_VERSION_1_8_1 || KSP_VERSION_1_9_1) || KSP_VERSION_1_10_1)
             // Prevent the orbit lines from flickering in 1.9.1 and 1.10.1
             PlanetariumCamera.Camera.farClipPlane = 1e14f;
 #endif
