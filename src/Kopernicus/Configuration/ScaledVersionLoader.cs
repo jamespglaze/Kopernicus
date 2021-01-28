@@ -90,7 +90,7 @@ namespace Kopernicus.Configuration
                 {
                     return ScaledMaterialType.Atmospheric;
                 }
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
                 if (ScaledPlanetRimAerialStandard.UsesSameShader(material))
                 {
                     return ScaledMaterialType.AtmosphericStandard;
@@ -112,7 +112,7 @@ namespace Kopernicus.Configuration
 
                 Boolean isVaccum = ScaledPlanetSimple.UsesSameShader(renderer.sharedMaterial);
                 Boolean isAtmospheric = ScaledPlanetRimAerial.UsesSameShader(renderer.sharedMaterial);
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
                 Boolean isAtmosphericStandard = ScaledPlanetRimAerialStandard.UsesSameShader(renderer.sharedMaterial);
 #endif
                 Boolean isStar = EmissiveMultiRampSunspots.UsesSameShader(renderer.sharedMaterial);
@@ -125,7 +125,7 @@ namespace Kopernicus.Configuration
                     case ScaledMaterialType.Atmospheric when !isAtmospheric:
                         renderer.sharedMaterial = new ScaledPlanetRimAerialLoader();
                         break;
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
                     case ScaledMaterialType.AtmosphericStandard when !isAtmosphericStandard:
                         renderer.sharedMaterial = new ScaledPlanetRimAerialStandardLoader();
                         break;
@@ -257,7 +257,7 @@ namespace Kopernicus.Configuration
 
                 Boolean isVaccum = renderer.sharedMaterial is ScaledPlanetSimpleLoader;
                 Boolean isAtmospheric = renderer.sharedMaterial is ScaledPlanetRimAerialLoader;
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
                 Boolean isAtmosphericStandard = renderer.sharedMaterial is ScaledPlanetRimAerialStandardLoader;
 #endif
                 Boolean isStar = renderer.sharedMaterial is EmissiveMultiRampSunspotsLoader;
@@ -270,7 +270,7 @@ namespace Kopernicus.Configuration
                     case ScaledMaterialType.Atmospheric when !isAtmospheric:
                         renderer.sharedMaterial = new ScaledPlanetRimAerialLoader(renderer.sharedMaterial);
                         goto default;
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
                     case ScaledMaterialType.AtmosphericStandard when !isAtmosphericStandard:
                         renderer.sharedMaterial = new ScaledPlanetRimAerialStandardLoader(renderer.sharedMaterial);
                         goto default;
@@ -288,7 +288,7 @@ namespace Kopernicus.Configuration
 
                 Boolean isVaccum = value is ScaledPlanetSimpleLoader;
                 Boolean isAtmospheric = value is ScaledPlanetRimAerialLoader;
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
                 Boolean isAtmosphericStandard = value is ScaledPlanetRimAerialStandardLoader;
 #endif
                 Boolean isStar = value is EmissiveMultiRampSunspotsLoader;
@@ -301,7 +301,7 @@ namespace Kopernicus.Configuration
                     case ScaledMaterialType.Atmospheric when !isAtmospheric:
                         renderer.sharedMaterial = new ScaledPlanetRimAerialLoader(value);
                         break;
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
                     case ScaledMaterialType.AtmosphericStandard when !isAtmosphericStandard:
                         renderer.sharedMaterial = new ScaledPlanetRimAerialStandardLoader(value);
                         break;

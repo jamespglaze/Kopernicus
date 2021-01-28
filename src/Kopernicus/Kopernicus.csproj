@@ -9,28 +9,41 @@
     <AssemblyName>Kopernicus</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>..\..\build\GameData\Kopernicus\Plugins\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_1110|x64' ">
+    <OutputPath>..\..\build\KSP1110\GameData\Kopernicus\Plugins\</OutputPath>
+    <DefineConstants>KSP_VERSION_1_11_0</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\build\GameData\Kopernicus\Plugins\</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>False</ConsolePause>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
-    <DefineConstants>KSP_VERSION_1_11</DefineConstants>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_1101|x64'">
+    <OutputPath>..\..\build\KSP1101\GameData\Kopernicus\Plugins\</OutputPath>
+    <DefineConstants>KSP_VERSION_1_10_1</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_191|x64'">
+    <OutputPath>..\..\build\KSP191\GameData\Kopernicus\Plugins\</OutputPath>
+    <DefineConstants>KSP_VERSION_1_9_1</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_181|x64'">
+    <OutputPath>..\..\build\KSP181\GameData\Kopernicus\Plugins\</OutputPath>
+    <DefineConstants>KSP_VERSION_1_8_1</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">

@@ -229,7 +229,7 @@ namespace Kopernicus.RuntimeUtility
 
             // Spawn
             ConfigNode vessel = null;
-#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
             if (Random.Range(0, 100) > RuntimeUtility.KopernicusConfig.CometPercentage)
             {
 #endif
@@ -265,7 +265,7 @@ namespace Kopernicus.RuntimeUtility
                 GameEvents.onNewVesselCreated.Fire(protoVessel.vesselRef);
                 GameEvents.onAsteroidSpawned.Fire(protoVessel.vesselRef);
                 Debug.Log("[Kopernicus] New object found near " + body.name + ": " + protoVessel.vesselName + "!");
-#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
             }
             else
             {

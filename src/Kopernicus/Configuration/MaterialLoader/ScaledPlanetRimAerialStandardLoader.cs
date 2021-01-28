@@ -22,7 +22,7 @@
  * 
  * https://kerbalspaceprogram.com
  */
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Kopernicus.Components.MaterialWrapper;
