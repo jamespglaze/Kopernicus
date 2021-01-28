@@ -9,8 +9,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release_1101|Any CPU = Release_1101|Any CPU
 		Release_1101|x64 = Release_1101|x64
-		Release_1110|Any CPU = Release_1110|Any CPU
-		Release_1110|x64 = Release_1110|x64
+		Release_1111|Any CPU = Release_1111|Any CPU
+		Release_1111|x64 = Release_1111|x64
 		Release_181|Any CPU = Release_181|Any CPU
 		Release_181|x64 = Release_181|x64
 		Release_191|Any CPU = Release_191|Any CPU
@@ -20,9 +20,9 @@ Global
 		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_1101|Any CPU.ActiveCfg = Release_1101|x64
 		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_1101|x64.ActiveCfg = Release_1101|x64
 		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_1101|x64.Build.0 = Release_1101|x64
-		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_1110|Any CPU.ActiveCfg = Release_1110|x64
-		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_1110|x64.ActiveCfg = Release_1110|x64
-		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_1110|x64.Build.0 = Release_1110|x64
+		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_1111|Any CPU.ActiveCfg = Release_1111|x64
+		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_1111|x64.ActiveCfg = Release_1111|x64
+		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_1111|x64.Build.0 = Release_1111|x64
 		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_181|Any CPU.ActiveCfg = Release_181|x64
 		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_181|x64.ActiveCfg = Release_181|x64
 		{AA91123F-E3D2-4BC0-8BDB-F8B6CFDC6C10}.Release_181|x64.Build.0 = Release_181|x64
