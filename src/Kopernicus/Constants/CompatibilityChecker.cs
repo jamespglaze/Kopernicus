@@ -63,7 +63,7 @@ namespace Kopernicus.Constants
 #endif
 #if (KSP_VERSION_1_11_1)
         internal const Int32 VERSION_MINOR = 11;
-        internal const Int32 REVISION = 0;
+        internal const Int32 REVISION = 1;
 #endif
         internal const Int32 KOPERNICUS = 70;
 
