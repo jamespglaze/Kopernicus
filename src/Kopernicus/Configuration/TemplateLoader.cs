@@ -171,7 +171,7 @@ namespace Kopernicus.Configuration
             // If we have a PQS
             if (Body.pqsVersion != null)
             {
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                 // We only support one surface material per body, so use the one with the highest quality available
                 if (GameSettings.TERRAIN_SHADER_QUALITY == 3)
                 {
@@ -218,7 +218,7 @@ namespace Kopernicus.Configuration
                         surfaceMaterial = Body.pqsVersion.surfaceMaterial;
                     }
 
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                     Body.pqsVersion.ultraQualitySurfaceMaterial = surfaceMaterial;
 #endif
                     Body.pqsVersion.highQualitySurfaceMaterial = surfaceMaterial;
@@ -239,7 +239,7 @@ namespace Kopernicus.Configuration
                         surfaceMaterial = Body.pqsVersion.surfaceMaterial;
                     }
 
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                     Body.pqsVersion.ultraQualitySurfaceMaterial = surfaceMaterial;
 #endif
                     Body.pqsVersion.highQualitySurfaceMaterial = surfaceMaterial;
@@ -260,7 +260,7 @@ namespace Kopernicus.Configuration
                         surfaceMaterial = Body.pqsVersion.surfaceMaterial;
                     }
 
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                     Body.pqsVersion.ultraQualitySurfaceMaterial = surfaceMaterial;
 #endif
                     Body.pqsVersion.highQualitySurfaceMaterial = surfaceMaterial;
@@ -277,7 +277,7 @@ namespace Kopernicus.Configuration
                         .First(pqs => pqs != Body.pqsVersion);
                     PQSMod_CelestialBodyTransform cbt = Body.pqsVersion
                         .GetComponentsInChildren<PQSMod_CelestialBodyTransform>(true).First();
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                     // We only support one surface material per body, so use the one with the highest quality available
                     if (GameSettings.TERRAIN_SHADER_QUALITY == 3)
                     {
@@ -323,7 +323,7 @@ namespace Kopernicus.Configuration
                         {
                             surfaceMaterial = ocean.surfaceMaterial;
                         }
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                         ocean.ultraQualitySurfaceMaterial = surfaceMaterial;
 #endif
                         ocean.highQualitySurfaceMaterial = surfaceMaterial;
@@ -343,7 +343,7 @@ namespace Kopernicus.Configuration
                         {
                             surfaceMaterial = ocean.surfaceMaterial;
                         }
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                         ocean.ultraQualitySurfaceMaterial = surfaceMaterial;
 #endif
                         ocean.highQualitySurfaceMaterial = surfaceMaterial;
@@ -363,7 +363,7 @@ namespace Kopernicus.Configuration
                         {
                             surfaceMaterial = ocean.surfaceMaterial;
                         }
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                         ocean.ultraQualitySurfaceMaterial = surfaceMaterial;
 #endif
                         ocean.highQualitySurfaceMaterial = surfaceMaterial;

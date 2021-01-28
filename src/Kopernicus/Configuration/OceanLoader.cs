@@ -130,7 +130,7 @@ namespace Kopernicus.Configuration
             {
                 switch (GameSettings.TERRAIN_SHADER_QUALITY)
                 {
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                     case 3:
                         if (Value.ultraQualitySurfaceMaterial != null)
                         {
@@ -162,7 +162,7 @@ namespace Kopernicus.Configuration
             }
             set
             {
-#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_0)
+#if (KSP_VERSION_1_9_1 || KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
                 Value.ultraQualitySurfaceMaterial = value;
 #endif
                 Value.highQualitySurfaceMaterial = value;
