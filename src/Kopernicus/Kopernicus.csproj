@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_1111|x64' ">
-    <OutputPath>..\..\build\KSP11111\GameData\Kopernicus\Plugins\</OutputPath>
+    <OutputPath>..\..\build\KSP1111\GameData\Kopernicus\Plugins\</OutputPath>
     <DefineConstants>KSP_VERSION_1_11_1</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
