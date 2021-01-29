@@ -7,11 +7,11 @@ February 04, 2020
 * Additional Content by: Gravitasi, aftokino, KCreator, Padishar, Kragrathea, OvenProofMars, zengei, MrHappyFace, Sigma88, Majiir (CompatibilityChecker)
 * Much thanks to Sarbian for ModuleManager and ModularFlightIntegrator
 
-New in this version (1.10.0-1)
+New in this version (UBE)
 -------------------
-- Updated to KSP 1.10.0
-- Readded particles support
-- Support for Jool shaders on Jool and only Jool.
+- Updated to KSP's latest versions
+- Latest features
+- Latest bugs
 
 This is the bleeding edge Kopernicus branch.  For the stable branch, please see:
 
