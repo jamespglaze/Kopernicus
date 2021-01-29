@@ -15,7 +15,7 @@ New in this version (UBE)
 
 This is the bleeding edge Kopernicus branch.  For the stable branch, please see:
 
-https://github.com/prestja/Kopernicus
+https://github.com/Kopernicus/Kopernicus
 
 Note - reparenting Kerbin or the Sun can cause the sky to be incorrect in the space center view. It is, however, correct in the flight view and the flight map view.
 
