@@ -195,34 +195,37 @@ namespace Kopernicus.RuntimeUtility
             PatchTimeOfDayAnimation();
             StartCoroutine(CallbackUtil.DelayedCallback(3, FixFlags));
             //Small Contract fixer to remove Sentinel Contracts
-            Type contractTypeToRemove = null;
-            try
+            if (!RuntimeUtility.KopernicusConfig.UseKopernicusAsteroidSystem.ToLower().Equals("stock"))
             {
-                foreach (Type contract in Contracts.ContractSystem.ContractTypes)
+                Type contractTypeToRemove = null;
+                try
                 {
-                    try
+                    foreach (Type contract in Contracts.ContractSystem.ContractTypes)
                     {
-
-                        if (contract.FullName.Contains("SentinelContract"))
+                        try
                         {
-                            contractTypeToRemove = contract;
+
+                            if (contract.FullName.Contains("SentinelContract"))
+                            {
+                                contractTypeToRemove = contract;
+                            }
+                        }
+                        catch
+                        {
+                            continue;
                         }
                     }
-                    catch
+                    if (!(contractTypeToRemove == null))
                     {
-                        continue;
+                        ContractSystem.ContractTypes.Remove(contractTypeToRemove);
+                        contractTypeToRemove = null;
+                        Debug.Log("[Kopernicus] Due to selected asteroid spawner, SENTINEL Contracts are broken and have been scrubbed!");
                     }
                 }
-                if (!(contractTypeToRemove == null))
+                catch
                 {
-                    ContractSystem.ContractTypes.Remove(contractTypeToRemove);
                     contractTypeToRemove = null;
-                    Debug.Log("[Kopernicus] ScenarioDiscoverableObjects is removed, scrubbing SENTINEL contracts.");
                 }
-            }
-            catch
-            {
-                contractTypeToRemove = null;
             }
             //Patch weights of contracts
             for (Int32 i = 0; i < PSystemManager.Instance.localBodies.Count; i++)

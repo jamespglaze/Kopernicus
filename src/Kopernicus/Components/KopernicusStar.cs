@@ -241,7 +241,11 @@ namespace Kopernicus.Components
             {
                 KopernicusStar star = KopernicusStar.Stars[i];
                 double distance = Vector3d.Distance(body.position, star.sun.position);
-                double aparentLuminosity = star.shifter.solarLuminosity * (1 / (distance * distance));
+                double aparentLuminosity = 0;
+                if (star.shifter.givesOffLight)
+                {
+                    aparentLuminosity = star.shifter.solarLuminosity * (1 / (distance * distance));
+                }
                 if (aparentLuminosity > greatestLuminosity)
                 {
                     greatestLuminosity = aparentLuminosity;
