@@ -38,6 +38,8 @@ namespace Kopernicus.Components
     /// </summary>
     public class KopernicusSolarPanels : PartModule
     {
+        //Timers
+        private int calculationTimer = 0;
         //Strings for Localization
         private static string SP_status_DirectSunlight = Localizer.Format("#Kopernicus_UI_DirectSunlight");//"Direct Sunlight"
         private static string SP_status_Underwater = Localizer.Format("#Kopernicus_UI_Underwater");//"Underwater"
@@ -68,15 +70,22 @@ namespace Kopernicus.Components
 
         public void LatePostCalculateTracking()
         {
-            for (Int32 n = 0; n < SPs.Length; n++)
+            calculationTimer++;
+            if (calculationTimer > 25)
             {
-                ModuleDeployableSolarPanel SP = SPs[n];
-
-                if (SP?.deployState == ModuleDeployablePart.DeployState.EXTENDED)
+                calculationTimer = 0;
                 {
-                    Vector3 normalized = (SP.trackingTransformLocal.position - SP.panelRotationTransform.position).normalized;
-                    FieldInfo trackingLOS = typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "trackingLOS");
-                    LatePostCalculateTracking((bool)trackingLOS.GetValue(SP), normalized,n);
+                    for (Int32 n = 0; n < SPs.Length; n++)
+                    {
+                        ModuleDeployableSolarPanel SP = SPs[n];
+
+                        if (SP?.deployState == ModuleDeployablePart.DeployState.EXTENDED)
+                        {
+                            Vector3 normalized = (SP.trackingTransformLocal.position - SP.panelRotationTransform.position).normalized;
+                            FieldInfo trackingLOS = typeof(ModuleDeployableSolarPanel).GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name == "trackingLOS");
+                            LatePostCalculateTracking((bool)trackingLOS.GetValue(SP), normalized, n);
+                        }
+                    }
                 }
             }
         }
@@ -231,8 +240,8 @@ namespace Kopernicus.Components
                 }
             }
 
-            // Use the flow rate
-            SP.flowRate = (Single)(SP.resHandler.UpdateModuleResourceOutputs(SP._flowRate) * SP.flowMult);
+            // We used to use the flow rate, but that's bugged, let it autorecalc...
+            //SP.flowRate = (Single)(SP.resHandler.UpdateModuleResourceOutputs(SP._flowRate) * SP.flowMult);
         }
 
         public void EarlyLateUpdate()

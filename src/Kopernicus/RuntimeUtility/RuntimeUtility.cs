@@ -24,6 +24,7 @@
  */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -51,6 +52,22 @@ namespace Kopernicus.RuntimeUtility
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class RuntimeUtility : MonoBehaviour
     {
+        //Plugin Path finding logic
+        private static string pluginPath;
+        public static string PluginPath
+        {
+            get
+            {
+                if (ReferenceEquals(null, pluginPath))
+                {
+                    string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                    UriBuilder uri = new UriBuilder(codeBase);
+                    pluginPath = Uri.UnescapeDataString(uri.Path);
+                    pluginPath = Path.GetDirectoryName(pluginPath);
+                }
+                return pluginPath;
+            }
+        }
         public static int physicsCorrectionCounter = 0;
         public static ConfigReader KopernicusConfig = new Kopernicus.Configuration.ConfigReader();
         // Awake() - flag this class as don't destroy on load and register delegates
@@ -128,6 +145,7 @@ namespace Kopernicus.RuntimeUtility
         // Execute MainMenu functions
         private void Start()
         {
+            WriteConfigIfNoneExists();
             RemoveUnselectableObjects();
             ApplyLaunchSitePatches();
             ApplyMusicAltitude();
@@ -1014,6 +1032,26 @@ namespace Kopernicus.RuntimeUtility
             for (int i = 0; i < flags?.Length; i++)
             {
                 flags[i].rootBone = flags[i]?.rootBone?.parent?.gameObject?.GetChild("bn_upper_flag_a01")?.transform;
+            }
+        }
+
+        private void WriteConfigIfNoneExists()
+        {
+            if (!File.Exists(PluginPath + "/../Config/Kopernicus_Config.cfg"))
+            {
+                Debug.Log("[Kopernicus] Generating default Kopernicus_Config.cfg");
+                StreamWriter configFile = new StreamWriter(PluginPath + "/../Config/Kopernicus_Config.cfg");
+                configFile.WriteLine("// Kopernicus base configuration.  Provides ability to flag things and set user options.  Generates at defaults for stock system and warnings config.");
+                configFile.WriteLine("Kopernicus_config");
+                configFile.WriteLine("{");
+                configFile.WriteLine("	EnforceShaders = false");
+                configFile.WriteLine("	WarnShaders = false");
+                configFile.WriteLine("	EnforcedShaderLevel = 2");
+                configFile.WriteLine("	ScatterCullDistance = 7250");
+                configFile.WriteLine("	UseKopernicusAsteroidSystem = True");
+                configFile.WriteLine("}");
+                configFile.Flush();
+                configFile.Close();
             }
         }
 

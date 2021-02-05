@@ -72,9 +72,6 @@ namespace Kopernicus.Configuration
             {
 				Debug.LogWarning("Error loading config, using defaults");
 			}
-
-
-
 		}
 	}
 }
