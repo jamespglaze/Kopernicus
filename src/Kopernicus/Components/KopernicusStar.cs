@@ -435,6 +435,22 @@ namespace Kopernicus.Components
         }
 
         /// <summary>
+        /// Returns the host star directly from the given body.
+        /// </summary>
+        public static CelestialBody GetLocalStar(CelestialBody body)
+        {
+            while (body?.orbit?.referenceBody != null)
+            {
+                if (body.isStar)
+                {
+                    break;
+                }
+                body = body.orbit.referenceBody;
+            }
+            return body;
+        }
+
+        /// <summary>
         /// Override this function and use <see cref="Current"/> instead of Planetarium sun
         /// </summary>
         public override Double GetLocalTimeAtPosition(Vector3d wPos, CelestialBody cb)

@@ -803,13 +803,12 @@ namespace Kopernicus.RuntimeUtility
         // Patch FlightIntegrator
         private static void PatchFlightIntegrator()
         {
-            if (HighLogic.LoadedScene != GameScenes.SPACECENTER)
+            if (HighLogic.LoadedScene.Equals(GameScenes.SPACECENTER))
             {
-                return;
+                Events.OnRuntimeUtilityPatchFI.Fire();
+                ModularFlightIntegrator.RegisterCalculateSunBodyFluxOverride(KopernicusStar.SunBodyFlux);
+                ModularFlightIntegrator.RegisterCalculateBackgroundRadiationTemperatureOverride(KopernicusHeatManager.RadiationTemperature);
             }
-            Events.OnRuntimeUtilityPatchFI.Fire();
-            ModularFlightIntegrator.RegisterCalculateSunBodyFluxOverride(KopernicusStar.SunBodyFlux);
-            ModularFlightIntegrator.RegisterCalculateBackgroundRadiationTemperatureOverride(KopernicusHeatManager.RadiationTemperature);
         }
 
         // Fix the Space Center Cameras
