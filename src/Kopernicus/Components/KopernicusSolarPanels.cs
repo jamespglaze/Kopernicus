@@ -253,12 +253,13 @@ namespace Kopernicus.Components
         public void ManualTracking()
         {
             // Assemble the buttons
-            Int32 stars = KopernicusStar.Stars.Count;
+            KopernicusStar[] orderedStars = KopernicusStar.Stars.OrderBy(s => Vector3.Distance(SPs[0].vessel.transform.position, s.sun.position)).ToArray();
+            Int32 stars = orderedStars.Count();
             DialogGUIBase[] options = new DialogGUIBase[stars + 1];
             options[0] = new DialogGUIButton(button_Auto, () => { _manualTracking = false; }, true);//Auto
             for (Int32 i = 0; i < stars; i++)
             {
-                CelestialBody body = KopernicusStar.Stars[i].sun;
+                CelestialBody body = orderedStars[i].sun;
                 options[i + 1] = new DialogGUIButton
                 (
                     body.bodyDisplayName.Replace("^N", ""),

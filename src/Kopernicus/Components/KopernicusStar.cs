@@ -227,7 +227,19 @@ namespace Kopernicus.Components
         /// </summary>
         public static KopernicusStar GetNearest(CelestialBody body)
         {
-            return Stars.OrderBy(s => Vector3.Distance(body.position, s.sun.position)).First();
+            KopernicusStar nearestStar = Stars.OrderBy(s => Vector3.Distance(body.position, s.sun.position)).First();
+            double greatestDistance = 0;
+            for (Int32 i = 0; i < KopernicusStar.Stars.Count; i++)
+            {
+                KopernicusStar star = KopernicusStar.Stars[i];
+                double distance = Vector3d.Distance(body.position, star.sun.position);
+                if (star.shifter.givesOffLight && distance > greatestDistance)
+                {
+                    greatestDistance = distance;
+                    nearestStar = star;
+                }
+            }
+            return nearestStar;
         }
 
         /// <summary>
@@ -236,7 +248,7 @@ namespace Kopernicus.Components
         public static KopernicusStar GetBrightest(CelestialBody body)
         {
             double greatestLuminosity = 0;
-            KopernicusStar BrightestStar = GetNearest(body); ;
+            KopernicusStar BrightestStar = GetNearest(body);
             for (Int32 i = 0; i < KopernicusStar.Stars.Count; i++)
             {
                 KopernicusStar star = KopernicusStar.Stars[i];
