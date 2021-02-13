@@ -21,9 +21,9 @@ namespace Kopernicus.Components.ModularScatter
         }
         private void Update()
         {
-            //Rate Limit it to doing a cull-calculation every 60 frames, which should be plenty since we don't update more anyways.  These are very heavy.
+            //Rate Limit it to doing a cull-calculation every 120 frames, which should be plenty since we don't update more anyways.  These are very heavy.
             counter++;
-            if (counter > 60)
+            if (counter > 120)
             {
                 if (!init)
                 {

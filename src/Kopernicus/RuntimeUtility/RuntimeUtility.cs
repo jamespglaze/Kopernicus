@@ -69,6 +69,7 @@ namespace Kopernicus.RuntimeUtility
             }
         }
         public static int physicsCorrectionCounter = 0;
+        public static GameScenes previousScene = GameScenes.MAINMENU;
         public static ConfigReader KopernicusConfig = new Kopernicus.Configuration.ConfigReader();
         // Awake() - flag this class as don't destroy on load and register delegates
         [SuppressMessage("ReSharper", "ConvertClosureToMethodGroup")]
@@ -212,45 +213,9 @@ namespace Kopernicus.RuntimeUtility
             FixCameras();
             PatchTimeOfDayAnimation();
             StartCoroutine(CallbackUtil.DelayedCallback(3, FixFlags));
-            //Small Contract fixer to remove Sentinel Contracts
-            if (!RuntimeUtility.KopernicusConfig.UseKopernicusAsteroidSystem.ToLower().Equals("stock"))
-            {
-                Type contractTypeToRemove = null;
-                try
-                {
-                    foreach (Type contract in Contracts.ContractSystem.ContractTypes)
-                    {
-                        try
-                        {
+            PatchContracts();
+            previousScene = HighLogic.LoadedScene;
 
-                            if (contract.FullName.Contains("SentinelContract"))
-                            {
-                                contractTypeToRemove = contract;
-                            }
-                        }
-                        catch
-                        {
-                            continue;
-                        }
-                    }
-                    if (!(contractTypeToRemove == null))
-                    {
-                        ContractSystem.ContractTypes.Remove(contractTypeToRemove);
-                        contractTypeToRemove = null;
-                        Debug.Log("[Kopernicus] Due to selected asteroid spawner, SENTINEL Contracts are broken and have been scrubbed!");
-                    }
-                }
-                catch
-                {
-                    contractTypeToRemove = null;
-                }
-            }
-            //Patch weights of contracts
-            for (Int32 i = 0; i < PSystemManager.Instance.localBodies.Count; i++)
-            {
-                PatchStarReferences(PSystemManager.Instance.localBodies[i]);
-                PatchContractWeight(PSystemManager.Instance.localBodies[i]);
-            }
         }
 
         // Transforms body references in the save games
@@ -692,10 +657,11 @@ namespace Kopernicus.RuntimeUtility
 
         private static void FixFlickeringOrbitLines()
         {
-#if ((KSP_VERSION_1_8_1 || KSP_VERSION_1_9_1) || KSP_VERSION_1_10_1)
-            // Prevent the orbit lines from flickering in 1.9.1 and 1.10.1
-            PlanetariumCamera.Camera.farClipPlane = 1e14f;
-#endif
+            if ((!(Versioning.version_minor < 9)) && (Versioning.version_minor < 11))
+            {
+                // Prevent the orbit lines from flickering in 1.9.1 and 1.10.1
+                PlanetariumCamera.Camera.farClipPlane = 1e14f;
+            }
         }
         // Whether to apply the customizations next frame
         private Boolean _orbitIconsReady;
@@ -811,11 +777,54 @@ namespace Kopernicus.RuntimeUtility
             }
         }
 
+        private static void PatchContracts()
+        {
+            //Small Contract fixer to remove Sentinel Contracts
+            if (!RuntimeUtility.KopernicusConfig.UseKopernicusAsteroidSystem.ToLower().Equals("stock"))
+            {
+                Type contractTypeToRemove = null;
+                try
+                {
+                    foreach (Type contract in Contracts.ContractSystem.ContractTypes)
+                    {
+                        try
+                        {
+
+                            if (contract.FullName.Contains("SentinelContract"))
+                            {
+                                contractTypeToRemove = contract;
+                            }
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                    }
+                    if (!(contractTypeToRemove == null))
+                    {
+                        ContractSystem.ContractTypes.Remove(contractTypeToRemove);
+                        contractTypeToRemove = null;
+                        Debug.Log("[Kopernicus] Due to selected asteroid spawner, SENTINEL Contracts are broken and have been scrubbed.");
+                    }
+                }
+                catch
+                {
+                    contractTypeToRemove = null;
+                }
+            }
+            //Patch weights of contracts
+            for (Int32 i = 0; i < PSystemManager.Instance.localBodies.Count; i++)
+            {
+                PatchStarReferences(PSystemManager.Instance.localBodies[i]);
+                PatchContractWeight(PSystemManager.Instance.localBodies[i]);
+            }
+        }
+
         // Fix the Space Center Cameras
         private static void FixCameras()
         {
             // Only run in the space center or the editor
-            if (HighLogic.LoadedScene != GameScenes.SPACECENTER && !HighLogic.LoadedSceneIsEditor)
+            if ((((previousScene != GameScenes.LOADING) || (previousScene != GameScenes.MAINMENU)) && ((HighLogic.LoadedScene != GameScenes.SPACECENTER && !HighLogic.LoadedSceneIsEditor))) || ((previousScene == GameScenes.SPACECENTER) && ((HighLogic.LoadedScene != GameScenes.SPACECENTER && !HighLogic.LoadedSceneIsEditor))))
             {
                 return;
             }

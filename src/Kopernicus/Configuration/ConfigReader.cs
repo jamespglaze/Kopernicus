@@ -35,7 +35,7 @@ using UnityEngine;
 namespace Kopernicus.Configuration
 {
 	public class ConfigReader
-    {
+	{
 		[Persistent]
 		public bool EnforceShaders;
 		[Persistent]
@@ -46,10 +46,8 @@ namespace Kopernicus.Configuration
 		public int ScatterCullDistance;
 		[Persistent]
 		public string UseKopernicusAsteroidSystem = "True";
-#if (KSP_VERSION_1_10_1 || KSP_VERSION_1_11_1)
 		[Persistent]
 		public int CometPercentage;
-#endif
 		public UrlDir.UrlConfig[] baseConfigs;
 		public void loadMainSettings()
 		{

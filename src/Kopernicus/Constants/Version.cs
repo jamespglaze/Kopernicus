@@ -38,8 +38,11 @@ namespace Kopernicus.Constants
         {
             get
             {
-                return CompatibilityChecker.VERSION_MAJOR + "." + CompatibilityChecker.VERSION_MINOR + "." +
-                       CompatibilityChecker.REVISION + "-" + CompatibilityChecker.KOPERNICUS;
+#if (!KSP_VERSION_1_8)
+                return "UBE-78";
+#else
+                return "LEGACY18_UBE-78";
+#endif
             }
         }
 
