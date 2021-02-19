@@ -47,7 +47,7 @@ namespace Kopernicus.Configuration
 		[Persistent]
 		public string UseKopernicusAsteroidSystem = "True";
 		[Persistent]
-		public int CometPercentage;
+		public int SolarRefreshRate = 1;
 		public UrlDir.UrlConfig[] baseConfigs;
 		public void loadMainSettings()
 		{
