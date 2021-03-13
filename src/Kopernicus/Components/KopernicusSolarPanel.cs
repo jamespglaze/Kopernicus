@@ -35,7 +35,7 @@ namespace Kopernicus.Components
     /// <summary>
     /// This is the replacement Kopernicus Solar Panel extension.
     /// </summary>
-    public class KopernicusSolarPanels : ModuleDeployableSolarPanel
+    public class KopernicusSolarPanel : ModuleDeployableSolarPanel
     {
         //Strings for Localization
         private static string SP_status_DirectSunlight = Localizer.Format("#Kopernicus_UI_DirectSunlight");  // "Direct Sunlight"
@@ -49,7 +49,7 @@ namespace Kopernicus.Components
         private float cachedFlowRate = 0;
 
         //timer value
-        private static int frameTimer = 0;
+        private int frameTimer = 0;
 
         [KSPField(guiActive = true, guiActiveEditor = false, guiName = "#Kopernicus_UI_TrackingBody", isPersistant = true)]
         [SuppressMessage("ReSharper", "NotAccessedField.Global")]
@@ -68,7 +68,7 @@ namespace Kopernicus.Components
             frameTimer++;
             if (HighLogic.LoadedSceneIsFlight)
             {
-                if (deployState == ModuleDeployablePart.DeployState.EXTENDED)
+                if ((deployState == ModuleDeployablePart.DeployState.EXTENDED))
                 {
                     if (frameTimer > (50 * Kopernicus.RuntimeUtility.RuntimeUtility.KopernicusConfig.SolarRefreshRate))
                     {

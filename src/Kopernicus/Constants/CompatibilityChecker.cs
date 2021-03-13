@@ -56,7 +56,7 @@ namespace Kopernicus.Constants
 #endif
         internal const Int32 VERSION_MINOR_LOWER_LIMIT = 8;
         internal const Int32 REVISION = 99;
-        internal const Int32 KOPERNICUS = 79;
+        internal const Int32 KOPERNICUS = 81;
 
         public static Boolean IsCompatible()
         {
@@ -90,24 +90,8 @@ namespace Kopernicus.Constants
                 return;
             }
 
-            Type moduleManager =
-                Parser.ModTypes.FirstOrDefault(t => t.Name == "ModuleManager" && t.Namespace == "ModuleManager");
-            if (moduleManager == null)
-            {
-                return; // no cat :(
-            }
-
-            FieldInfo nyan = moduleManager.GetField("nyan", BindingFlags.Instance | BindingFlags.NonPublic);
-            FieldInfo ncats = moduleManager.GetField("nCats", BindingFlags.Instance | BindingFlags.NonPublic);
-            Object mm = FindObjectOfType(moduleManager);
-            nyan?.SetValue(mm, true);
-            ncats?.SetValue(mm, true);
-
             // Nobody can read that popup
-            ScreenMessages.PostScreenMessage(
-                "Kopernicus will not work on this version of KSP!\nPlease don't try to open your saved games!",
-                Single.MaxValue,
-                ScreenMessageStyle.UPPER_LEFT, true);
+            ScreenMessages.PostScreenMessage("Kopernicus will not work on this version of KSP!\nPlease don't try to open your saved games!", 5f, ScreenMessageStyle.UPPER_CENTER);
         }
 
         public void Start()

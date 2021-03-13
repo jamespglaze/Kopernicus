@@ -37,13 +37,13 @@ namespace Kopernicus.Configuration
 	public class ConfigReader
 	{
 		[Persistent]
-		public bool EnforceShaders;
+		public bool EnforceShaders = false;
 		[Persistent]
-		public bool WarnShaders;
+		public bool WarnShaders = false;
 		[Persistent]
-		public int EnforcedShaderLevel;
+		public int EnforcedShaderLevel = 2;
 		[Persistent]
-		public int ScatterCullDistance;
+		public int ScatterCullDistance = 7250;
 		[Persistent]
 		public string UseKopernicusAsteroidSystem = "True";
 		[Persistent]
