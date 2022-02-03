@@ -7,6 +7,10 @@ February 04, 2020
 * Additional Content by: Gravitasi, aftokino, KCreator, Padishar, Kragrathea, OvenProofMars, zengei, MrHappyFace, Sigma88, Majiir (CompatibilityChecker)
 * Much thanks to Sarbian for ModuleManager and ModularFlightIntegrator
 
+NOTICE!!!
+The Bleeding Edge has been mothballed since 2020, so please use the stable brance at https://github.com/Kopernicus/Kopernicus instead.
+NOTICE!!!
+
 New in this version (UBE)
 -------------------
 - Updated to KSP's latest versions
