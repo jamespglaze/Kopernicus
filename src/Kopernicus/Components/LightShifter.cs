@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Kopernicus Planetary System Modifier
  * ------------------------------------------------------------- 
  * This library is free software; you can redistribute it and/or
@@ -66,7 +66,7 @@ namespace Kopernicus.Components
                 // Fill it with default values
                 prefab.sunlightColor = Color.white;
                 prefab.sunlightIntensity = 0.9f;
-                prefab.sunlightShadowStrength = 1f;
+                prefab.sunlightShadowStrength = 0.7523364f;
                 prefab.scaledSunlightColor = Color.white;
                 prefab.scaledSunlightIntensity = 0.9f;
                 prefab.ivaSunColor = new Color(1.0f, 0.977f, 0.896f, 1.0f);
@@ -148,7 +148,7 @@ namespace Kopernicus.Components
             PhysicsGlobals.SolarInsolationAtHome = solarInsolation;
             PhysicsGlobals.RadiationFactor = radiationFactor;
 
-            FieldInfo SolarLuminosity = typeof(PhysicsGlobals).GetField("solarLuminosity", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo SolarLuminosity = typeof(PhysicsGlobals).GetField("solarLuminosity", BindingFlags.NonPublic | BindingFlags.Instance);
             SolarLuminosity.SetValue(PhysicsGlobals.Instance, SolarIntensityAtHomeMultiplier * PhysicsGlobals.SolarLuminosityAtHome);
         }
     }

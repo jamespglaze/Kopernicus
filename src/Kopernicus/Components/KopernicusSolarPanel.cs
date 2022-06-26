@@ -38,11 +38,11 @@ namespace Kopernicus.Components
     public class KopernicusSolarPanel : ModuleDeployableSolarPanel
     {
         //Strings for Localization
-        private static string SP_status_DirectSunlight = Localizer.Format("#Kopernicus_UI_DirectSunlight");  // "Direct Sunlight"
-        private static string SP_status_Underwater = Localizer.Format("#Kopernicus_UI_Underwater");          // "Underwater"
-        private static string button_Auto = Localizer.Format("#Kopernicus_UI_AutoTracking");                 // "Auto"
-        private static string SelectBody = Localizer.Format("#Kopernicus_UI_SelectBody");                    // "Select Tracking Body"
-        private static string SelectBody_Msg = Localizer.Format("#Kopernicus_UI_SelectBody_Msg");            // "Please select the Body you want to track with this Solar Panel."
+        private static readonly string SP_status_DirectSunlight = Localizer.Format("#Kopernicus_UI_DirectSunlight");  // "Direct Sunlight"
+        private static readonly string SP_status_Underwater = Localizer.Format("#Kopernicus_UI_Underwater");          // "Underwater"
+        private static readonly string button_Auto = Localizer.Format("#Kopernicus_UI_AutoTracking");                 // "Auto"
+        private static readonly string SelectBody = Localizer.Format("#Kopernicus_UI_SelectBody");                    // "Select Tracking Body"
+        private static readonly string SelectBody_Msg = Localizer.Format("#Kopernicus_UI_SelectBody_Msg");            // "Please select the Body you want to track with this Solar Panel."
 
         //panel power cached value
         private double _cachedFlowRate = 0;
@@ -59,8 +59,8 @@ namespace Kopernicus.Components
         private Boolean _manualTracking;
 
         //declare internal float curves
-        private static FloatCurve AtmosphericAttenutationAirMassMultiplier = new FloatCurve();
-        private static FloatCurve AtmosphericAttenutationSolarAngleMultiplier = new FloatCurve();
+        private static readonly FloatCurve AtmosphericAttenutationAirMassMultiplier = new FloatCurve();
+        private static readonly FloatCurve AtmosphericAttenutationSolarAngleMultiplier = new FloatCurve();
 
         public override void FixedUpdate()
         {
@@ -189,35 +189,33 @@ namespace Kopernicus.Components
             {
                 sunAOA = 0f;
                 status = Localizer.Format("#Kopernicus_UI_PanelBlocked", blockingObject);
+                return;
+            }
+            status = "Direct Sunlight";
+            if (panelType == PanelType.FLAT)
+            {
+                sunAOA = Mathf.Clamp(Vector3.Dot(trackingDotTransform.forward, trackDir), 0f, 1f);
+            }
+            else if (panelType != PanelType.CYLINDRICAL)
+            {
+                sunAOA = 0.25f;
             }
             else
             {
-                status = "Direct Sunlight";
-                if (panelType == PanelType.FLAT)
+                Vector3 direction;
+                if (alignType == PanelAlignType.PIVOT)
                 {
-                    sunAOA = Mathf.Clamp(Vector3.Dot(trackingDotTransform.forward, trackDir), 0f, 1f);
+                    direction = trackingDotTransform.forward;
                 }
-                else if (panelType != PanelType.CYLINDRICAL)
+                else if (alignType != PanelAlignType.X)
                 {
-                    sunAOA = 0.25f;
+                    direction = alignType != PanelAlignType.Y ? part.partTransform.forward : part.partTransform.up;
                 }
                 else
                 {
-                    Vector3 direction;
-                    if (alignType == PanelAlignType.PIVOT)
-                    {
-                        direction = trackingDotTransform.forward;
-                    }
-                    else if (alignType != PanelAlignType.X)
-                    {
-                        direction = alignType != PanelAlignType.Y ? part.partTransform.forward : part.partTransform.up;
-                    }
-                    else
-                    {
-                        direction = part.partTransform.right;
-                    }
-                    sunAOA = (1f - Mathf.Abs(Vector3.Dot(direction, trackDir))) * 0.318309873f;
+                    direction = part.partTransform.right;
                 }
+                sunAOA = (1f - Mathf.Abs(Vector3.Dot(direction, trackDir))) * 0.318309873f;
             }
         }
 

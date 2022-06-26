@@ -34,19 +34,18 @@ namespace Kopernicus.Constants
     public static class Version
     {
         // Version information
-        private static String VersionNumber
+        public static String VersionNumber
         {
             get
             {
 #if (!KSP_VERSION_1_8)
-                return "UBE-78";
+                return "UBE-82";
 #else
-                return "LEGACY18_UBE-78";
+                return "LEGACY18_UBE-82";
 #endif
             }
         }
 
-        // Get a String for the logging
         // Get a String for the logging
         public static String VersionId
         {
@@ -57,7 +56,7 @@ namespace Kopernicus.Constants
 #else
                 const String DEVELOPMENT_BUILD = "";
 #endif
-                return "RTB's Unified Bleeding-Edge Kopernicus " + VersionNumber + DEVELOPMENT_BUILD + " - (BuildDate: " +
+                return "Kopernicus Bleeding Edge Branch" + VersionNumber + DEVELOPMENT_BUILD + " - (BuildDate: " +
                        BuiltTime(Assembly.GetCallingAssembly()).ToString("dd.MM.yyyy HH:mm:ss") + "; AssemblyHash: " +
                        AssemblyHandle() + ")";
             }
@@ -67,7 +66,12 @@ namespace Kopernicus.Constants
         private static String AssemblyHandle()
         {
             String filePath = Assembly.GetCallingAssembly().Location;
-            return Convert.ToBase64String(SHA1.Create().ComputeHash(File.ReadAllBytes(filePath)));
+            string hash;
+            using (var sha1 = SHA1.Create())
+            {
+                hash = Convert.ToBase64String(sha1.ComputeHash(File.ReadAllBytes(filePath)));
+            }
+            return hash;
         }
 
         // Returns the time when the assembly was built
@@ -81,8 +85,10 @@ namespace Kopernicus.Constants
 
             try
             {
-                s = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                s.Read(b, 0, 2048);
+                using (s = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    s.Read(b, 0, 2048);
+                }
             }
             finally
             {

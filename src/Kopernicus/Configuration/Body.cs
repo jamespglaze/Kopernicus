@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Kopernicus Planetary System Modifier
  * ------------------------------------------------------------- 
  * This library is free software; you can redistribute it and/or
@@ -307,6 +307,10 @@ namespace Kopernicus.Configuration
                                 UnityEngine.Debug.Log("[Kopernicus] Old Jool detected, leaving shaders alone!");
                             }
                         }
+                        else
+                        {
+                            UnityEngine.Debug.Log("[Kopernicus] Original Jool detected, leaving shaders alone!");
+                        }
                     }
                 }
                 // Create accessors
@@ -335,7 +339,7 @@ namespace Kopernicus.Configuration
                 GeneratedBody.celestialBody.ocean = false;
 
                 // Create the scaled version
-                GeneratedBody.scaledVersion = new GameObject(Name) {layer = GameLayers.SCALED_SPACE};
+                GeneratedBody.scaledVersion = new GameObject(Name) { layer = GameLayers.SCALED_SPACE };
                 GeneratedBody.scaledVersion.transform.parent = Utility.Deactivator;
                 // Create accessors
                 Debug = new DebugLoader();
@@ -348,7 +352,7 @@ namespace Kopernicus.Configuration
         internal MonoBehaviour GasGiantMaterialControls(PSystemBody generatedBody)
         {
             MonoBehaviour[] components = generatedBody.scaledVersion.GetComponents<MonoBehaviour>();
-            if ((Versioning.version_minor == 10) || (Versioning.version_minor == 11))
+            if (Versioning.version_minor > 9)
             {
                 MonoBehaviour component = components[3]; //strict index, likely to break
                 if (component.name.Equals(generatedBody.scaledVersion.name))
@@ -361,7 +365,7 @@ namespace Kopernicus.Configuration
         internal MonoBehaviour MaterialBasedOnGraphicsSetting(PSystemBody generatedBody)
         {
             MonoBehaviour[] components = generatedBody.scaledVersion.GetComponents<MonoBehaviour>();
-            if ((Versioning.version_minor == 10) || (Versioning.version_minor == 11))
+            if (Versioning.version_minor > 9)
             {
                 MonoBehaviour component = components[2]; //strict index, likely to break
                 if (component.name.Equals(generatedBody.scaledVersion.name))

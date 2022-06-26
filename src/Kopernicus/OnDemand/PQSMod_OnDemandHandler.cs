@@ -39,6 +39,8 @@ namespace Kopernicus.OnDemand
         // State
         private Boolean _isLoaded;
 
+        private static string activeBodyName = "";
+
         // Disabling
         public override void OnSphereInactive()
         {
@@ -77,6 +79,21 @@ namespace Kopernicus.OnDemand
 
         private void LateUpdate()
         {
+            // If we are in flight with a vessel, update the cached active body.
+            if (FlightGlobals.ActiveVessel)
+            {
+                activeBodyName = FlightGlobals.ActiveVessel.mainBody.name;
+            }
+
+            // If we are the currently active body, do not unload.
+            if (sphere)
+            {
+                if (activeBodyName == sphere.name)
+                {
+                    return;
+                }
+            }
+
             // If we aren't loaded or we're not wanting to unload then do nothing
             if (!_isLoaded || _unloadTime == 0)
             {

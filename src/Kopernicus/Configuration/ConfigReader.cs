@@ -34,42 +34,61 @@ using UnityEngine;
 
 namespace Kopernicus.Configuration
 {
-	public class ConfigReader
-	{
-		[Persistent]
-		public bool EnforceShaders = false;
-		[Persistent]
-		public bool WarnShaders = false;
-		[Persistent]
-		public int EnforcedShaderLevel = 2;
-		[Persistent]
-		public int ScatterCullDistance = 7250;
-		[Persistent]
-		public string UseKopernicusAsteroidSystem = "True";
-		[Persistent]
-		public int SolarRefreshRate = 1;
-		public UrlDir.UrlConfig[] baseConfigs;
-		public void loadMainSettings()
-		{
-			baseConfigs = GameDatabase.Instance.GetConfigs("Kopernicus_config");
-			if (baseConfigs.Length == 0)
-			{
-				Debug.LogWarning("No Kopernicus_Config file found, using defaults");
-				return;
-			}
+    public class ConfigReader
+    {
+        [Persistent]
+        public bool EnforceShaders = false;
+        [Persistent]
+        public bool WarnShaders = false;
+        [Persistent]
+        public int EnforcedShaderLevel = 2;
+        [Persistent]
+        public string UseKopernicusAsteroidSystem = "True";
+        [Persistent]
+        public int SolarRefreshRate = 1;
+        [Persistent]
+        public int ScatterCountLimit = 4250;
+        [Persistent]
+        public int ScatterDistanceLimit = 4250;
+        [Persistent]
+        public bool EnableKopernicusShadowManager = true;
+        [Persistent]
+        public int ShadowDistanceLimit = 25000;
+        [Persistent]
+        public bool DisableMainMenuMunScene = true;
+        [Persistent]
+        public bool HandleHomeworldAtmosphericUnitDisplay = true;
+        [Persistent]
+        public bool UseIncorrectScatterDensityLogic = false;
+        [Persistent]
+        public bool DisableFarAwayColliders = false;
+        [Persistent]
+        public float SettingsWindowXcoord = 0;
+        [Persistent]
+        public float SettingsWindowYcoord = 0;
 
-			if (baseConfigs.Length > 1)
-			{
-				Debug.LogWarning("Multiple Kopernicus_Config files detected, check your install");
-			}
-			try
-			{
-				ConfigNode.LoadObjectFromConfig(this, baseConfigs[0].config);
-			}
-			catch
+        public UrlDir.UrlConfig[] baseConfigs;
+        public void loadMainSettings()
+        {
+            baseConfigs = GameDatabase.Instance.GetConfigs("Kopernicus_config");
+            if (baseConfigs.Length == 0)
             {
-				Debug.LogWarning("Error loading config, using defaults");
-			}
-		}
-	}
+                Debug.LogWarning("No Kopernicus_Config file found, using defaults");
+                return;
+            }
+
+            if (baseConfigs.Length > 1)
+            {
+                Debug.LogWarning("Multiple Kopernicus_Config files detected, check your install");
+            }
+            try
+            {
+                ConfigNode.LoadObjectFromConfig(this, baseConfigs[0].config);
+            }
+            catch
+            {
+                Debug.LogWarning("Error loading config, using defaults");
+            }
+        }
+    }
 }

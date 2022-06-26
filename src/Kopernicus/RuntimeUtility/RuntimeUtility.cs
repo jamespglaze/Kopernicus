@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Kopernicus Planetary System Modifier
  * -------------------------------------------------------------
  * This library is free software; you can redistribute it and/or
@@ -52,6 +52,8 @@ namespace Kopernicus.RuntimeUtility
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class RuntimeUtility : MonoBehaviour
     {
+        //old mockbody for compat
+        public static CelestialBody mockBody = null;
         //Plugin Path finding logic
         private static string pluginPath;
         public static string PluginPath
@@ -68,8 +70,6 @@ namespace Kopernicus.RuntimeUtility
                 return pluginPath;
             }
         }
-        public static int physicsCorrectionCounter = 0;
-        public static GameScenes previousScene = GameScenes.MAINMENU;
         public static ConfigReader KopernicusConfig = new Kopernicus.Configuration.ConfigReader();
         // Awake() - flag this class as don't destroy on load and register delegates
         [SuppressMessage("ReSharper", "ConvertClosureToMethodGroup")]
@@ -88,7 +88,6 @@ namespace Kopernicus.RuntimeUtility
             KopernicusConfig.loadMainSettings();
             // Init the runtime logging
             new Logger("Kopernicus.Runtime", true).SetAsActive();
-
             // Add handlers
             GameEvents.OnMapEntered.Add(() => OnMapEntered());
             GameEvents.onLevelWasLoaded.Add(s => OnLevelWasLoaded(s));
@@ -96,8 +95,11 @@ namespace Kopernicus.RuntimeUtility
             GameEvents.onProtoVesselSave.Add(d => TransformBodyReferencesOnSave(d));
 
             // Add Callback only if necessary
-            if (FlightGlobals.GetHomeBody().atmospherePressureSeaLevel != 101.324996948242)
-                KbApp_PlanetParameters.CallbackAfterActivate += CallbackAfterActivate;
+            if (KopernicusConfig.HandleHomeworldAtmosphericUnitDisplay)
+            {
+                if (FlightGlobals.GetHomeBody().atmospherePressureSeaLevel != 101.324996948242)
+                    KbApp_PlanetParameters.CallbackAfterActivate += CallbackAfterActivate;
+            }
 
             // Log
             Logger.Default.Log("[Kopernicus] RuntimeUtility Started");
@@ -161,31 +163,6 @@ namespace Kopernicus.RuntimeUtility
             }
         }
 
-        private void Update()
-        {
-            physicsCorrectionCounter++;
-            if (physicsCorrectionCounter > 60)
-            {
-                PatchColliders();
-                physicsCorrectionCounter = 0;
-            }
-        }
-
-        //Collision physics patcher
-        public static void PatchColliders()
-        {
-            if (HighLogic.LoadedSceneIsFlight && (CameraManager.GetCurrentCamera().cameraType == CameraType.Game))
-            {
-                if (FlightGlobals.ActiveVessel != null)
-                {
-                    CollisionEnhancer.bypass = false;
-                    CollisionEnhancer.UnderTerrainTolerance = 0;
-                    FlightGlobals.ActiveVessel.ResetCollisionIgnores();
-
-                }
-            }
-        }
-		
         // Stuff
         private void LateUpdate()
         {
@@ -206,16 +183,15 @@ namespace Kopernicus.RuntimeUtility
         }
         // Run patches every time a new scene was loaded
         [SuppressMessage("ReSharper", "Unity.IncorrectMethodSignature")]
+#pragma warning disable UNT0006 // Incorrect message signature
         private void OnLevelWasLoaded(GameScenes scene)
+#pragma warning restore UNT0006 // Incorrect message signature
         {
-            PatchColliders();
             PatchFlightIntegrator();
             FixCameras();
             PatchTimeOfDayAnimation();
             StartCoroutine(CallbackUtil.DelayedCallback(3, FixFlags));
             PatchContracts();
-            previousScene = HighLogic.LoadedScene;
-
         }
 
         // Transforms body references in the save games
@@ -305,8 +281,7 @@ namespace Kopernicus.RuntimeUtility
             starObj.transform.localPosition = Vector3.zero;
             starObj.transform.localRotation = Quaternion.identity;
             starObj.transform.localScale = Vector3.one;
-            starObj.transform.position = body.position;
-            starObj.transform.rotation = body.rotation;
+            starObj.transform.SetPositionAndRotation(body.position, body.rotation);
 
             KopernicusStar.CelestialBodies.Add(star.sun, star);
 
@@ -317,8 +292,7 @@ namespace Kopernicus.RuntimeUtility
             flareObj.transform.localPosition = Vector3.zero;
             flareObj.transform.localRotation = Quaternion.identity;
             flareObj.transform.localScale = Vector3.one;
-            flareObj.transform.position = body.position;
-            flareObj.transform.rotation = body.rotation;
+            flareObj.transform.SetPositionAndRotation(body.position, body.rotation);
         }
 
         private static void ApplyLaunchSitePatches()
@@ -438,14 +412,14 @@ namespace Kopernicus.RuntimeUtility
                     Destroy(this);
                     return;
                 }
-         
+
                 fixes.Add(body.transform.name,
                     new KeyValuePair<CelestialBody, CelestialBody>(oldRef, body.referenceBody));
                 body.referenceBody.orbitingBodies.Add(body);
                 body.referenceBody.orbitingBodies =
                     body.referenceBody.orbitingBodies.OrderBy(cb => cb.orbit.semiMajorAxis).ToList();
                 body.orbit.Init();
-    
+
                 //body.orbitDriver.UpdateOrbit();
 
                 // Calculations
@@ -454,18 +428,18 @@ namespace Kopernicus.RuntimeUtility
                     body.sphereOfInfluence = body.orbit.semiMajorAxis *
                                              Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
                 }
-              
+
                 if (!body.Has("hillSphere"))
                 {
                     body.hillSphere = body.orbit.semiMajorAxis * (1 - body.orbit.eccentricity) *
                                       Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.333333333333333);
                 }
-              
+
                 if (!body.solarRotationPeriod)
                 {
-                   continue;
+                    continue;
                 }
-       
+
                 Double rotationPeriod = body.rotationPeriod;
                 Double orbitalPeriod = body.orbit.period;
                 body.rotationPeriod = rotationPeriod * orbitalPeriod / (orbitalPeriod + rotationPeriod);
@@ -572,6 +546,7 @@ namespace Kopernicus.RuntimeUtility
             {
                 return;
             }
+
             if (MapView.fetch)
             {
                 MapView.fetch.max3DlineDrawDist = Single.MaxValue;
@@ -619,7 +594,7 @@ namespace Kopernicus.RuntimeUtility
                 FieldInfo castField = typeof(OrbitTargeter).GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                     .FirstOrDefault(f => f.FieldType == typeof(OrbitRenderer.OrbitCastHit));
 
-                _fields = new[] {modeField, contextField, castField};
+                _fields = new[] { modeField, contextField, castField };
             }
 
             // Remove buttons in map view for barycenters
@@ -634,7 +609,7 @@ namespace Kopernicus.RuntimeUtility
                 return;
             }
 
-            Int32 mode = (Int32) _fields[0].GetValue(targeter);
+            Int32 mode = (Int32)_fields[0].GetValue(targeter);
             if (mode != 2)
             {
                 return;
@@ -780,12 +755,13 @@ namespace Kopernicus.RuntimeUtility
         // Patch FlightIntegrator
         private static void PatchFlightIntegrator()
         {
-            if (HighLogic.LoadedScene.Equals(GameScenes.SPACECENTER))
+            if (HighLogic.LoadedScene != GameScenes.SPACECENTER)
             {
-                Events.OnRuntimeUtilityPatchFI.Fire();
-                ModularFlightIntegrator.RegisterCalculateSunBodyFluxOverride(KopernicusStar.SunBodyFlux);
-                ModularFlightIntegrator.RegisterCalculateBackgroundRadiationTemperatureOverride(KopernicusHeatManager.RadiationTemperature);
+                return;
             }
+            Events.OnRuntimeUtilityPatchFI.Fire();
+            ModularFlightIntegrator.RegisterCalculateSunBodyFluxOverride(KopernicusStar.SunBodyFlux);
+            ModularFlightIntegrator.RegisterCalculateBackgroundRadiationTemperatureOverride(KopernicusHeatManager.RadiationTemperature);
         }
 
         private static void PatchContracts()
@@ -835,139 +811,141 @@ namespace Kopernicus.RuntimeUtility
         private static void FixCameras()
         {
             // Only run in the space center or the editor
-            if ((((previousScene != GameScenes.LOADING) || (previousScene != GameScenes.MAINMENU)) && ((HighLogic.LoadedScene != GameScenes.SPACECENTER && !HighLogic.LoadedSceneIsEditor))) || ((previousScene == GameScenes.SPACECENTER) && ((HighLogic.LoadedScene != GameScenes.SPACECENTER && !HighLogic.LoadedSceneIsEditor))))
+            if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedSceneIsEditor)
             {
-                return;
-            }
+                // Get the parental body
+                CelestialBody body = Planetarium.fetch != null ? Planetarium.fetch.Home : FlightGlobals.Bodies.Find(b => b.isHomeWorld);
 
-            // Get the parental body
-            CelestialBody body = Planetarium.fetch != null ? Planetarium.fetch.Home : FlightGlobals.Bodies.Find(b => b.isHomeWorld);
-
-            // If there's no body, exit.
-            if (body == null)
-            {
-                Logger.Active.Log("[Kopernicus] Couldn't find the parental body!");
-                return;
-            }
-
-            // Get the KSC object
-            PQSCity ksc = body.pqsController.GetComponentsInChildren<PQSCity>(true).First(m => m.name == "KSC");
-
-            // If there's no KSC, exit.
-            if (ksc == null)
-            {
-                Logger.Active.Log("[Kopernicus] Couldn't find the KSC object!");
-                return;
-            }
-
-            // Go through the SpaceCenterCameras and fix them
-            foreach (SpaceCenterCamera2 cam in Resources.FindObjectsOfTypeAll<SpaceCenterCamera2>())
-            {
-                if (ksc.repositionToSphere || ksc.repositionToSphereSurface)
+                // If there's no body, exit.
+                if (body == null)
                 {
-                    Double normalHeight = body.pqsController.GetSurfaceHeight(ksc.repositionRadial.normalized) - body.Radius;
-                    if (ksc.repositionToSphereSurface)
-                    {
-                        normalHeight += ksc.repositionRadiusOffset;
-                    }
-                    cam.altitudeInitial = 0f - (Single)normalHeight;
-                }
-                else
-                {
-                    cam.altitudeInitial = 0f - (Single)ksc.repositionRadiusOffset;
+                    Logger.Active.Log("[Kopernicus] Couldn't find the parental body!");
+                    return;
                 }
 
-                // re-implement cam.Start()
-                // fields
-                Type camType = cam.GetType();
-                FieldInfo camSphere = null;
-                FieldInfo transform1 = null;
-                FieldInfo transform2 = null;
-                FieldInfo surfaceObj = null;
+                // Get the KSC object
+                PQSCity ksc = body.pqsController.GetComponentsInChildren<PQSCity>(true).First(m => m.name == "KSC");
 
-                // get fields
-                FieldInfo[] fields = camType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-                for (Int32 i = 0; i < fields.Length; ++i)
+                // If there's no KSC, exit.
+                if (ksc == null)
                 {
-                    FieldInfo fi = fields[i];
-                    if (fi.FieldType == typeof(PQS))
-                    {
-                        camSphere = fi;
-                    }
-                    else if (fi.FieldType == typeof(Transform) && transform1 == null)
-                    {
-                        transform1 = fi;
-                    }
-                    else if (fi.FieldType == typeof(Transform) && transform2 == null)
-                    {
-                        transform2 = fi;
-                    }
-                    else if (fi.FieldType == typeof(SurfaceObject))
-                    {
-                        surfaceObj = fi;
-                    }
+                    Logger.Active.Log("[Kopernicus] Couldn't find the KSC object!");
+                    return;
                 }
-                if (camSphere != null && transform1 != null && transform2 != null && surfaceObj != null)
-                {
-                    camSphere.SetValue(cam, body.pqsController);
 
-                    Transform initialTransform = body.pqsController.transform.Find(cam.initialPositionTransformName);
-                    if (initialTransform != null)
+                // Go through the SpaceCenterCameras and fix them
+                foreach (SpaceCenterCamera2 cam in Resources.FindObjectsOfTypeAll<SpaceCenterCamera2>())
+                {
+                    if (ksc.repositionToSphere || ksc.repositionToSphereSurface)
                     {
-                        transform1.SetValue(cam, initialTransform);
-                        cam.transform.NestToParent(initialTransform);
+                        Double normalHeight = body.pqsController.GetSurfaceHeight(ksc.repositionRadial.normalized) - body.Radius;
+                        if (ksc.repositionToSphereSurface)
+                        {
+                            normalHeight += ksc.repositionRadiusOffset;
+                        }
+                        cam.altitudeInitial = 0f - (Single)normalHeight;
                     }
                     else
                     {
-                        Logger.Active.Log("[Kopernicus] SSC2 can't find initial transform!");
-                        Transform initialTrfOrig = transform1.GetValue(cam) as Transform;
-                        if (initialTrfOrig != null)
+                        cam.altitudeInitial = 0f - (Single)ksc.repositionRadiusOffset;
+                    }
+
+                    // re-implement cam.Start()
+                    // fields
+                    Type camType = cam.GetType();
+                    FieldInfo camSphere = null;
+                    FieldInfo transform1 = null;
+                    FieldInfo transform2 = null;
+                    FieldInfo surfaceObj = null;
+
+                    // get fields
+                    FieldInfo[] fields = camType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+                    for (Int32 i = 0; i < fields.Length; ++i)
+                    {
+                        FieldInfo fi = fields[i];
+                        if (fi.FieldType == typeof(PQS))
                         {
-                            cam.transform.NestToParent(initialTrfOrig);
+                            camSphere = fi;
+                        }
+                        else if (fi.FieldType == typeof(Transform) && transform1 == null)
+                        {
+                            transform1 = fi;
+                        }
+                        else if (fi.FieldType == typeof(Transform) && transform2 == null)
+                        {
+                            transform2 = fi;
+                        }
+                        else if (fi.FieldType == typeof(SurfaceObject))
+                        {
+                            surfaceObj = fi;
+                        }
+                    }
+                    if (camSphere != null && transform1 != null && transform2 != null && surfaceObj != null)
+                    {
+                        camSphere.SetValue(cam, body.pqsController);
+
+                        Transform initialTransform = body.pqsController.transform.Find(cam.initialPositionTransformName);
+                        if (initialTransform != null)
+                        {
+                            transform1.SetValue(cam, initialTransform);
+                            cam.transform.NestToParent(initialTransform);
                         }
                         else
                         {
-                            Logger.Active.Log("[Kopernicus] SSC2 own initial transform null!");
+                            Logger.Active.Log("[Kopernicus] SSC2 can't find initial transform!");
+                            Transform initialTrfOrig = transform1.GetValue(cam) as Transform;
+                            if (initialTrfOrig != null)
+                            {
+                                cam.transform.NestToParent(initialTrfOrig);
+                            }
+                            else
+                            {
+                                Logger.Active.Log("[Kopernicus] SSC2 own initial transform null!");
+                            }
                         }
-                    }
-                    Transform camTransform = transform2.GetValue(cam) as Transform;
-                    if (camTransform != null)
-                    {
-                        camTransform.NestToParent(cam.transform);
-                        if (FlightCamera.fetch != null && FlightCamera.fetch.transform != null)
+                        Transform camTransform = transform2.GetValue(cam) as Transform;
+                        if (camTransform != null)
                         {
-                            FlightCamera.fetch.transform.NestToParent(camTransform);
+                            camTransform.NestToParent(cam.transform);
+                            if (FlightCamera.fetch != null && FlightCamera.fetch.transform != null)
+                            {
+                                FlightCamera.fetch.transform.NestToParent(camTransform);
+                            }
+                            if (LocalSpace.fetch != null && LocalSpace.fetch.transform != null)
+                            {
+                                LocalSpace.fetch.transform.position = camTransform.position;
+                            }
                         }
-                        if (LocalSpace.fetch != null && LocalSpace.fetch.transform != null)
+                        else
                         {
-                            LocalSpace.fetch.transform.position = camTransform.position;
+                            Logger.Active.Log("[Kopernicus] SSC2 cam transform null!");
                         }
+
+                        cam.ResetCamera();
+
+                        SurfaceObject so = surfaceObj.GetValue(cam) as SurfaceObject;
+                        if (so != null)
+                        {
+                            so.ReturnToParent();
+                            DestroyImmediate(so);
+                        }
+                        else
+                        {
+                            Logger.Active.Log("[Kopernicus] SSC2 surfaceObject is null!");
+                        }
+
+                        surfaceObj.SetValue(cam, SurfaceObject.Create(initialTransform.gameObject, FlightGlobals.currentMainBody, 3, KFSMUpdateMode.FIXEDUPDATE));
+                        Logger.Active.Log("[Kopernicus] Fixed SpaceCenterCamera");
                     }
                     else
                     {
-                        Logger.Active.Log("[Kopernicus] SSC2 cam transform null!");
+                        Logger.Active.Log("[Kopernicus] ERROR fixing space center camera, could not find some fields");
                     }
-
-                    cam.ResetCamera();
-
-                    SurfaceObject so = surfaceObj.GetValue(cam) as SurfaceObject;
-                    if (so != null)
-                    {
-                        so.ReturnToParent();
-                        DestroyImmediate(so);
-                    }
-                    else
-                    {
-                        Logger.Active.Log("[Kopernicus] SSC2 surfaceObject is null!");
-                    }
-
-                    surfaceObj.SetValue(cam, SurfaceObject.Create(initialTransform.gameObject, FlightGlobals.currentMainBody, 3, KFSMUpdateMode.FIXEDUPDATE));
-                    Logger.Active.Log("[Kopernicus] Fixed SpaceCenterCamera");
                 }
-                else
-                {
-                    Logger.Active.Log("[Kopernicus] ERROR fixing space center camera, could not find some fields");
-                }
+            }
+            else
+            {
+                return;
             }
         }
 
@@ -1028,29 +1006,46 @@ namespace Kopernicus.RuntimeUtility
         }
 
         // Flag Fixer
-        private  void ApplyFlagFixes()
+        private void ApplyFlagFixes()
         {
             GameEvents.OnKSCFacilityUpgraded.Add(FixFlags);
             GameEvents.OnKSCStructureRepaired.Add(FixFlags);
         }
 
-        private  void FixFlags(DestructibleBuilding data)
+        private void FixFlags(DestructibleBuilding data)
         {
             FixFlags();
         }
 
-        private  void FixFlags(Upgradeables.UpgradeableFacility data0, int data1)
+        private void FixFlags(Upgradeables.UpgradeableFacility data0, int data1)
         {
             FixFlags();
         }
 
-        private  void FixFlags()
+        private void FixFlags()
         {
-            PQSCity KSC = FlightGlobals.GetHomeBody()?.pqsController?.GetComponentsInChildren<PQSCity>(true)?.FirstOrDefault(p => p?.name == "KSC");
-            SkinnedMeshRenderer[] flags = KSC?.GetComponentsInChildren<SkinnedMeshRenderer>(true)?.Where(smr => smr?.name == "Flag")?.ToArray();
-            for (int i = 0; i < flags?.Length; i++)
+            if (FlightGlobals.GetHomeBody() != null && FlightGlobals.GetHomeBody().pqsController != null)
             {
-                flags[i].rootBone = flags[i]?.rootBone?.parent?.gameObject?.GetChild("bn_upper_flag_a01")?.transform;
+                PQSCity KSC = FlightGlobals
+                .GetHomeBody()
+                .pqsController
+                .GetComponentsInChildren<PQSCity>(true)?
+                .FirstOrDefault(p => p.name == "KSC");
+
+                SkinnedMeshRenderer[] flags = KSC
+                .GetComponentsInChildren<SkinnedMeshRenderer>(true)
+                .Where(smr => smr.name == "Flag")?
+                .ToArray();
+
+                flags.ToList().ForEach(flag =>
+                {
+                    flag.rootBone = flag
+                        .rootBone
+                        .parent
+                        .gameObject
+                        .GetChild("bn_upper_flag_a01")
+                        .transform;
+                });
             }
         }
 
@@ -1059,25 +1054,79 @@ namespace Kopernicus.RuntimeUtility
             if (!File.Exists(PluginPath + "/../Config/Kopernicus_Config.cfg"))
             {
                 Debug.Log("[Kopernicus] Generating default Kopernicus_Config.cfg");
-                StreamWriter configFile = new StreamWriter(PluginPath + "/../Config/Kopernicus_Config.cfg");
-                configFile.WriteLine("// Kopernicus base configuration.  Provides ability to flag things and set user options.  Generates at defaults for stock system and warnings config.");
-                configFile.WriteLine("Kopernicus_config");
-                configFile.WriteLine("{");
-                configFile.WriteLine("	EnforceShaders = false");
-                configFile.WriteLine("	WarnShaders = false");
-                configFile.WriteLine("	EnforcedShaderLevel = 2");
-                configFile.WriteLine("	ScatterCullDistance = 7250");
-                configFile.WriteLine("	UseKopernicusAsteroidSystem = True");
-                configFile.WriteLine("	SolarRefreshRate = 1");
-                configFile.WriteLine("}");
-                configFile.Flush();
-                configFile.Close();
+                using (StreamWriter configFile = new StreamWriter(PluginPath + "/../Config/Kopernicus_Config.cfg"))
+                {
+                    configFile.WriteLine("// Kopernicus base configuration.  Provides ability to flag things and set user options.  Generates at defaults for stock settings and warnings config.");
+                    configFile.WriteLine("Kopernicus_config");
+                    configFile.WriteLine("{");
+                    configFile.WriteLine("	EnforceShaders = False //Boolean.  Whether or not to force the user into EnforcedShaderLevel, not allowing them to change settings.");
+                    configFile.WriteLine("	WarnShaders = False //Boolean.  Whether or not to warn the user with a message if not using EnforcedShaderLevel.");
+                    configFile.WriteLine("	EnforcedShaderLevel = 2 //Integer.  A number defining the enforced shader level for the above parameters.  0=Low,1=Medium,2=High,3=Ultra.");
+                    configFile.WriteLine("	UseKopernicusAsteroidSystem = True //String with three valid values, True,False, and Stock.  True means use the old customizable Kopernicus asteroid generator with no comet support (many packs use this so it's the default).  False means don't generate anything, or wait for an external generator.  Stock means use the internal games generator, which supports comets, but usually only works well in stock based systems with Dres and Kerbin present.");
+                    configFile.WriteLine("	SolarRefreshRate = 1 //Integer.  A number defining the number of seconds between EC calculations when using the multistar cfg file.  Can be used to finetune performance (higher runs faster).  Otherwise irrelevant.");
+                    configFile.WriteLine("	ScatterCountLimit = 4250 //Integer.  A number defining the maximum number of land scatters that may spawn.  Works best set close to ScatterDistanceLimit, setting them far apart can lead to odd patterning behavior.");
+                    configFile.WriteLine("	ScatterDistanceLimit = 4250 //Integer.  A number defining the maximum distance away at which a land scatter may spawn.  Works best set close to ScatterCountLimit, setting them far apart can lead to odd patterning behavior.");
+                    configFile.WriteLine("	EnableKopernicusShadowManager = True //Boolean.  Whether or not to run the Internal Kopernicus Shadow System.  True by default, users using mods that do their own shadows (scatterer etc) may want to disable this to save a small bit of performance.");
+                    configFile.WriteLine("	ShadowDistanceLimit = 25000 //Integer.  A number defining the maximum distance at which shadows may be cast.  Lower numbers tend to yield less shadow cascading artifacts, but higher numbers cast shadows farther. Default at 25000 is an approximation of stock. Only works if EnableKopernicusShadowManager is true.");
+                    configFile.WriteLine("	DisableMainMenuMunScene = True //Boolean.  Whether or not to disable the Mun main menu scene.  Only set to false if you actually have a Mun, and want that scene back.");
+                    configFile.WriteLine("	HandleHomeworldAtmosphericUnitDisplay = True //Boolean.  This is for calculating 1atm unit at home world.  Normally should be true, but mods like PlanetaryInfoPlus may want to set this false.");
+                    configFile.WriteLine("	UseIncorrectScatterDensityLogic = False //Boolean.  This is a compatability option for old modpacks that were built with the old (wrong) density logic in mind.  Turn on if scatters seem too dense.  Please do not use in true in new releases.");
+                    configFile.WriteLine("	DisableFarAwayColliders = False //Boolean.  Disables distant colliders farther away than stock eeloo. This fixes the distant body sinking bug, but keeping track of the collider state has a slight performance penalty. Advised to use only in larger than stock systems. Be advised this breaks raycasts beyond stock eeloo range.");
+                    configFile.WriteLine("	SettingsWindowXcoord = 0");
+                    configFile.WriteLine("	SettingsWindowYcoord = 0");
+                    configFile.WriteLine("}");
+                    configFile.Flush();
+                    configFile.Close();
+                }
             }
         }
 
+        private void UpdateConfig()
+        {
+            if (File.Exists(PluginPath + "/../Config/Kopernicus_Config.cfg"))
+            {
+                File.Delete(PluginPath + "/../Config/Kopernicus_Config.cfg");
+            }
+            if (!File.Exists(PluginPath + "/../Config/Kopernicus_Config.cfg"))
+            {
+                Debug.Log("[Kopernicus] Writing out updated Kopernicus_Config.cfg");
+                using (StreamWriter configFile = new StreamWriter(PluginPath + "/../Config/Kopernicus_Config.cfg"))
+                {
+                    configFile.WriteLine("// Kopernicus base configuration.  Provides ability to flag things and set user options.  Generates at defaults for stock settings and warnings config.");
+                    configFile.WriteLine("Kopernicus_config");
+                    configFile.WriteLine("{");
+                    configFile.WriteLine("	EnforceShaders = " + KopernicusConfig.EnforceShaders.ToString() + " //Boolean.  Whether or not to force the user into EnforcedShaderLevel, not allowing them to change settings.");
+                    configFile.WriteLine("	WarnShaders = " + KopernicusConfig.WarnShaders.ToString() + " //Boolean.  Whether or not to warn the user with a message if not using EnforcedShaderLevel.");
+                    configFile.WriteLine("	EnforcedShaderLevel = " + KopernicusConfig.EnforcedShaderLevel.ToString() + " //Integer.  A number defining the enforced shader level for the above parameters.  0=Low,1=Medium,2=High,3=Ultra.");
+                    if ((!KopernicusConfig.UseKopernicusAsteroidSystem.ToLower().Equals("true")) && (!KopernicusConfig.UseKopernicusAsteroidSystem.ToLower().Equals("false")) && (!KopernicusConfig.UseKopernicusAsteroidSystem.ToLower().Equals("stock")))
+                    {
+                        configFile.WriteLine("	UseKopernicusAsteroidSystem = True //String with three valid values, True,False, and Stock.  True means use the old customizable Kopernicus asteroid generator with no comet support (many packs use this so it's the default).  False means don't generate anything, or wait for an external generator.  Stock means use the internal games generator, which supports comets, but usually only works well in stock based systems with Dres and Kerbin present.");
+                    }
+                    else
+                    {
+                        configFile.WriteLine("	UseKopernicusAsteroidSystem = " + KopernicusConfig.UseKopernicusAsteroidSystem + " //String with three valid values, True,False, and Stock.  True means use the old customizable Kopernicus asteroid generator with no comet support (many packs use this so it's the default).  False means don't generate anything, or wait for an external generator.  Stock means use the internal games generator, which supports comets, but usually only works well in stock based systems with Dres and Kerbin present.");
+                    }
+                    configFile.WriteLine("	SolarRefreshRate = " + KopernicusConfig.SolarRefreshRate.ToString() + " //Integer.  A number defining the number of seconds between EC calculations when using the multistar cfg file.  Can be used to finetune performance (higher runs faster).  Otherwise irrelevant.");
+                    configFile.WriteLine("	ScatterCountLimit = " + KopernicusConfig.ScatterCountLimit.ToString() + " //Integer.  A number defining the maximum number of land scatters that may spawn.  Works best set close to ScatterDistanceLimit, setting them far apart can lead to odd patterning behavior.");
+                    configFile.WriteLine("	ScatterDistanceLimit = " + KopernicusConfig.ScatterDistanceLimit.ToString() + " //Integer.  A number defining the maximum distance away at which a land scatter may spawn.  Works best set close to ScatterCountLimit, setting them far apart can lead to odd patterning behavior.");
+                    configFile.WriteLine("	EnableKopernicusShadowManager = " + KopernicusConfig.EnableKopernicusShadowManager.ToString() + " //Boolean.  Whether or not to run the Internal Kopernicus Shadow System.  True by default, users using mods that do their own shadows (scatterer etc) may want to disable this to save a small bit of performance.");
+                    configFile.WriteLine("	ShadowDistanceLimit = " + KopernicusConfig.ShadowDistanceLimit + " //Integer.  A number defining the maximum distance at which shadows may be cast.  Lower numbers yield less shadow cascading artifacts, but higher numbers cast shadows farther. Default at 25000 is an approximation of stock. Only works if EnableKopernicusShadowManager is true.");
+                    configFile.WriteLine("	DisableMainMenuMunScene = " + KopernicusConfig.DisableMainMenuMunScene.ToString() + " //Boolean.  Whether or not to disable the Mun main menu scene.  Only set to false if you actually have a Mun, and want that scene back.");
+                    configFile.WriteLine("	HandleHomeworldAtmosphericUnitDisplay = " + KopernicusConfig.HandleHomeworldAtmosphericUnitDisplay.ToString() + " //Boolean.  This is for calculating 1atm unit at home world.  Normally should be true, but mods like PlanetaryInfoPlus may want to set this false.");
+                    configFile.WriteLine("	UseIncorrectScatterDensityLogic = " + KopernicusConfig.UseIncorrectScatterDensityLogic.ToString() + " //Boolean.  This is a compatability option for old modpacks that were built with the old (wrong) density logic in mind.  Turn on if scatters seem too dense.  Please do not use in true in new releases.");
+                    configFile.WriteLine("	DisableFarAwayColliders  = " + KopernicusConfig.DisableFarAwayColliders.ToString() + " //Boolean.  Disables distant colliders farther away than stock eeloo. This fixes the distant body sinking bug, but keeping track of the collider state has a slight performance penalty. Advised to use only in larger than stock systems. Be advised this breaks raycasts beyond stock eeloo range.");
+                    configFile.WriteLine("	SettingsWindowXcoord = " + KopernicusConfig.SettingsWindowXcoord.ToString());
+                    configFile.WriteLine("	SettingsWindowYcoord = " + KopernicusConfig.SettingsWindowYcoord.ToString());
+                    configFile.WriteLine("}");
+                    configFile.Flush();
+                    configFile.Close();
+                }
+            }
+        }
         // Remove the Handlers
         private void OnDestroy()
         {
+            UpdateConfig();
             GameEvents.OnMapEntered.Remove(OnMapEntered);
             GameEvents.onLevelWasLoaded.Remove(OnLevelWasLoaded);
             GameEvents.onProtoVesselLoad.Remove(TransformBodyReferencesOnLoad);

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Kopernicus Planetary System Modifier
  * -------------------------------------------------------------
  * This library is free software; you can redistribute it and/or
@@ -157,7 +157,7 @@ namespace Kopernicus.Components
             light = gameObject.GetComponent<Light>();
 
             // Gah
-            typeof(Sun).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            typeof(Sun).GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                 .Last(f => f.FieldType == typeof(Light)).SetValue(this, light);
 
             // sun flare
@@ -373,7 +373,14 @@ namespace Kopernicus.Components
             CalculatePhysics();
 
             // Get "Correct" values
-            flightIntegrator.BaseFICalculateSunBodyFlux();
+            try
+            {
+                flightIntegrator.BaseFICalculateSunBodyFlux();
+            }
+            catch
+            {
+                //Why is this happening?
+            }
 
             // FI Values
             Boolean directSunlight = flightIntegrator.Vessel.directSunlight;
@@ -505,7 +512,7 @@ namespace Kopernicus.Components
                 homeBody = homeBody.referenceBody;
             }
 
-            typeof(PhysicsGlobals).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            typeof(PhysicsGlobals).GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(f => f.FieldType == typeof(Double)).Skip(2).First().SetValue(PhysicsGlobals.Instance,
                     Math.Pow(homeBody.orbit.semiMajorAxis, 2) * 4 * 3.14159265358979 *
                     PhysicsGlobals.SolarLuminosityAtHome);
@@ -514,11 +521,13 @@ namespace Kopernicus.Components
 
 
         /// <summary>
-        /// Returns the host star directly from the given body.
+        /// Returns the host star cb directly from the given body.
         /// </summary>
         public static CelestialBody GetLocalStar(CelestialBody body)
         {
+#pragma warning disable UNT0008 // Null propagation on Unity objects
             while (body?.orbit?.referenceBody != null)
+#pragma warning restore UNT0008 // Null propagation on Unity objects
             {
                 if (body.isStar)
                 {
@@ -530,11 +539,31 @@ namespace Kopernicus.Components
         }
 
         /// <summary>
+        /// Returns the host star cb directly from the given body.
+        /// </summary>
+        public static CelestialBody GetNearestBodyOverSystenRoot(CelestialBody body)
+        {
+#pragma warning disable UNT0008 // Null propagation on Unity objects
+            while (body?.referenceBody != null)
+#pragma warning restore UNT0008 // Null propagation on Unity objects
+            {
+                if (body.referenceBody == FlightGlobals.Bodies[0])
+                {
+                    break;
+                }
+                body = body.referenceBody;
+            }
+            return body;
+        }
+
+        /// <summary>
         /// Returns the host planet directly above the current star.
         /// </summary>
         public static CelestialBody GetLocalPlanet(CelestialBody body)
         {
+#pragma warning disable UNT0008 // Null propagation on Unity objects
             while (body?.orbit?.referenceBody != null)
+#pragma warning restore UNT0008 // Null propagation on Unity objects
             {
                 if (body.orbit.referenceBody.isStar)
                 {

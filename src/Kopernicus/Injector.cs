@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Kopernicus Planetary System Modifier
  * -------------------------------------------------------------
  * This library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ namespace Kopernicus
 
         // The checksum of the System.cfg file.
         [SuppressMessage("ReSharper", "UnusedMember.Local")]
-        private const String CONFIG_CHECKSUM = "73eb1037678bc520a0fe2e89768e0549b36f17a9cac7136af6e3e6b7a0ccf9b9";
+        private const String CONFIG_CHECKSUM = "cc7bda69901a41a4231c0a84696615029c4116834e0fceda70cc18d863279533";
 
         // Backup of the old system prefab, in case someone deletes planet templates we need at Runtime (Kittopia)
         public static PSystem StockSystemPrefab { get; private set; }
@@ -93,7 +93,7 @@ namespace Kopernicus
                 // Parser Config
                 ParserOptions.Register("Kopernicus",
                     new ParserOptions.Data
-                        {ErrorCallback = e => Logger.Active.LogException(e), LogCallback = s => Logger.Active.Log(s)});
+                    { ErrorCallback = e => Logger.Active.LogException(e), LogCallback = s => Logger.Active.Log(s) });
 
                 // Yo garbage collector - we have work to do man
                 DontDestroyOnLoad(this);
@@ -108,22 +108,24 @@ namespace Kopernicus
                 }
 
                 // Was the system template modified?
-                #if !DEBUG
+#if !DEBUG
                 String systemCfgPath = KSPUtil.ApplicationRootPath + "GameData/Kopernicus/Config/System.cfg";
                 if (File.Exists(systemCfgPath))
                 {
                     Byte[] data = File.ReadAllBytes(systemCfgPath);
-                    SHA256 sha256 = SHA256.Create();
-                    String checksum = BitConverter.ToString(sha256.ComputeHash(data));
-                    checksum = checksum.Replace("-", "");
-                    checksum = checksum.ToLower();
-                    if (checksum != CONFIG_CHECKSUM)
+                    using (SHA256 sha256 = SHA256.Create())
                     {
-                        throw new Exception(
-                            "The file 'Kopernicus/Config/System.cfg' was modified directly without ModuleManager");
+                        String checksum = BitConverter.ToString(sha256.ComputeHash(data));
+                        checksum = checksum.Replace("-", "");
+                        checksum = checksum.ToLower();
+                        if (checksum != CONFIG_CHECKSUM)
+                        {
+                            throw new Exception(
+                                "The file 'Kopernicus/Config/System.cfg' was modified directly without ModuleManager");
+                        }
                     }
                 }
-                #endif
+#endif
 
                 // Backup the old prefab
                 StockSystemPrefab = PSystemManager.Instance.systemPrefab;
@@ -188,8 +190,14 @@ namespace Kopernicus
 
                 // Fix the flight globals index of each body and patch it's SOI
                 Int32 counter = 0;
+                CelestialBody mockBody = null;
                 foreach (CelestialBody body in FlightGlobals.Bodies)
                 {
+                    //Find ye old watchdog for slaying (if it exists)
+                    if (body.name.Equals("KopernicusWatchdog"))
+                    {
+                        mockBody = body;
+                    }
                     // Event
                     Events.OnPreBodyFixing.Fire(body);
 
@@ -223,6 +231,10 @@ namespace Kopernicus
                     // Make the Body a barycenter
                     if (body.Get("barycenter", false))
                     {
+                        foreach (Collider collider in body.scaledBody.GetComponentsInChildren<Collider>(true))
+                        {
+                            collider.enabled = false;
+                        }
                         body.scaledBody.SetActive(false);
                     }
 
@@ -234,10 +246,28 @@ namespace Kopernicus
                             renderer.enabled = false;
                         }
 
+                        foreach (Collider collider in body.scaledBody.GetComponentsInChildren<Collider>(true))
+                        {
+                            collider.enabled = false;
+                        }
+
                         foreach (ScaledSpaceFader fader in body.scaledBody.GetComponentsInChildren<ScaledSpaceFader>(
                             true))
                         {
                             fader.enabled = false;
+                        }
+                    }
+                    else
+                    {
+                        foreach (Renderer renderer in body.scaledBody.GetComponentsInChildren<Renderer>(true))
+                        {
+                            if (renderer.enabled)
+                            {
+                                foreach (Collider collider in body.scaledBody.GetComponentsInChildren<Collider>(true))
+                                {
+                                    collider.enabled = true;
+                                }
+                            }
                         }
                     }
 
@@ -247,6 +277,23 @@ namespace Kopernicus
                     // Log
                     Logger.Default.Log("Found Body: " + body.bodyName + ":" + body.flightGlobalsIndex + " -> SOI = " +
                                        body.sphereOfInfluence + ", Hill Sphere = " + body.hillSphere);
+                }
+                //Mark the watchdog for proper removal
+                if (mockBody != null)
+                {
+                    try
+                    {
+                        FlightGlobals.Bodies.Remove(mockBody);
+                        if (Kopernicus.Components.KopernicusStar.GetLocalStar(mockBody).orbitingBodies.Contains(mockBody))
+                        {
+                            Kopernicus.Components.KopernicusStar.GetLocalStar(mockBody).orbitingBodies.Remove(mockBody);
+                        }
+                        mockBody.gameObject.DestroyGameObject();
+                    }
+                    catch
+                    {
+
+                    }
                 }
 
                 // Fix the maximum viewing distance of the map view camera (get the farthest away something can be from the root object)
@@ -291,7 +338,7 @@ namespace Kopernicus
                 }
 
                 PlanetariumCamera.fetch.maxDistance =
-                    (Single) maximumDistance * 3.0f / ScaledSpace.Instance.scaleFactor;
+                    (Single)maximumDistance * 3.0f / ScaledSpace.Instance.scaleFactor;
 
                 // Call the event
                 Events.OnPostFixing.Fire();

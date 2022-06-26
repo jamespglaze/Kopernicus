@@ -50,7 +50,7 @@ namespace Kopernicus.Components
         {
             if (data.ContainsKey(id))
             {
-                return (T) data[id];
+                return (T)data[id];
             }
 
             throw new IndexOutOfRangeException();
@@ -84,7 +84,7 @@ namespace Kopernicus.Components
         /// </summary>
         public void Remove(String id)
         {
-            if(data.ContainsKey(id))
+            if (data.ContainsKey(id))
             {
                 data.Remove(id);
             }

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Kopernicus Planetary System Modifier
  * ------------------------------------------------------------- 
  * This library is free software; you can redistribute it and/or
@@ -38,83 +38,38 @@ namespace Kopernicus.Components
     public class KSC : SerializableMonoBehaviour
     {
         // PQSCity
-        [SerializeField]
         public Double? latitude;
-
-        [SerializeField]
         public Double? longitude;
-
-        [SerializeField]
         public Vector3? reorientInitialUp;
-
-        [SerializeField]
         public Vector3? repositionRadial;
-
-        [SerializeField]
         public Boolean? repositionToSphere;
-
-        [SerializeField]
         public Boolean? repositionToSphereSurface;
-
-        [SerializeField]
         public Boolean? repositionToSphereSurfaceAddHeight;
-
-        [SerializeField]
         public Boolean? reorientToSphere;
-
-        [SerializeField]
         public Double? repositionRadiusOffset;
-
-        [SerializeField]
         public Double? lodvisibleRangeMult;
-
-        [SerializeField]
         public Single? reorientFinalAngle;
 
         // PQSMod_MapDecalTangent
-        [SerializeField]
         public Vector3? position;
-
-        [SerializeField]
         public Double? radius;
-
-        [SerializeField]
         public Double? heightMapDeformity;
-
-        [SerializeField]
         public Double? absoluteOffset;
-
-        [SerializeField]
         public Boolean? absolute;
-
-        [SerializeField]
         public Double? decalLatitude;
-
-        [SerializeField]
         public Double? decalLongitude;
 
         // PQSCity Ground Material
-        [SerializeField]
         public Texture2D mainTexture;
-
-        [SerializeField]
         public Color? color;
 
         // Grass Material
-        [SerializeField]
         public GrassMaterial Material;
 
         // Editor Ground Material
-        [SerializeField]
         public Texture2D editorGroundTex;
-
-        [SerializeField]
         public Color? editorGroundColor;
-
-        [SerializeField]
         public Vector2? editorGroundTexScale;
-
-        [SerializeField]
         public Vector2? editorGroundTexOffset;
 
         // Current Instance
@@ -370,7 +325,7 @@ namespace Kopernicus.Components
                     return;
                 }
 
-                Material[] materials = Resources.FindObjectsOfTypeAll<Material>().Where(m => (m.shader.name.Contains("KSC"))).ToArray();
+                Material[] materials = Resources.FindObjectsOfTypeAll<Material>().Where(m => (m.shader.name.Contains("Ground KSC"))).ToArray();
                 for (int i = materials.Length; i > 0; i--)
                 {
                     var material = materials[i - 1];
@@ -411,9 +366,12 @@ namespace Kopernicus.Components
                 return;
             }
 
-            GameObject scenery = GameObject.Find("VABscenery") ?? GameObject.Find("SPHscenery");
-            Material material = scenery?.GetChild("ksc_terrain")?.GetComponent<Renderer>()?.sharedMaterial;
-            
+            GameObject scenery = (GameObject.Find("VABscenery") != null)
+                ? GameObject.Find("VABscenery")
+                : GameObject.Find("SPHscenery");
+            Material material = null;
+            if (scenery != null) material = scenery.GetChild("ksc_terrain").GetComponent<Renderer>().sharedMaterial;
+
             if (material == null)
             {
                 return;

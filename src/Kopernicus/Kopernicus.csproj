@@ -30,14 +30,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>H:\KSP1111\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>H:\KSP1123\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Kopernicus.Parser">
-      <HintPath>H:\KSP1111\GameData\Kopernicus\Plugins\Kopernicus.Parser.dll</HintPath>
+      <HintPath>H:\KSP1123\GameData\Kopernicus\Plugins\Kopernicus.Parser.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ModularFlightIntegrator">
-      <HintPath>H:\KSP1111\GameData\ModularFlightIntegrator\ModularFlightIntegrator.dll</HintPath>
+      <HintPath>H:\KSP1123\GameData\ModularFlightIntegrator\ModularFlightIntegrator.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -45,37 +46,46 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>H:\KSP1111\KSP_x64_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>H:\KSP1123\KSP_x64_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>H:\KSP1111\KSP_x64_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+      <HintPath>H:\KSP1123\KSP_x64_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>H:\KSP1111\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>H:\KSP1123\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>H:\KSP1111\KSP_x64_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>H:\KSP1123\KSP_x64_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>D:\Program Files\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>D:\Program Files\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>H:\KSP1111\KSP_x64_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath>H:\KSP1123\KSP_x64_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>H:\KSP1111\KSP_x64_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>H:\KSP1123\KSP_x64_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>H:\KSP1111\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>H:\KSP1123\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>H:\KSP1111\KSP_x64_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+      <HintPath>H:\KSP1123\KSP_x64_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ToolbarButton.cs" />
     <Compile Include="Components\DrawTools.cs" />
     <Compile Include="Components\HazardousBody.cs" />
     <Compile Include="Components\KopernicusHeatManager.cs" />
@@ -122,7 +132,6 @@
     <Compile Include="Components\ModularScatter\LightEmitter.cs" />
     <Compile Include="Components\ModularScatter\ModularScatter.cs" />
     <Compile Include="Components\ModularScatter\ScatterColliders.cs" />
-    <Compile Include="Components\ModularScatter\ScatterDistanceCuller.cs" />
     <Compile Include="Components\ModularScatter\SeaLevelScatter.cs" />
     <Compile Include="Components\ModuleSurfaceObjectTrigger.cs" />
     <Compile Include="Components\NameChanger.cs" />
@@ -130,6 +139,7 @@
     <Compile Include="Components\OrbitRendererUpdater.cs" />
     <Compile Include="Components\PlanetaryParticle.cs" />
     <Compile Include="Components\PQSLandControlFixer.cs" />
+    <Compile Include="Components\PQSMod_BiomeSampler.cs" />
     <Compile Include="Components\PQSMod_TextureAtlasFixer.cs" />
     <Compile Include="Components\Ring.cs" />
     <Compile Include="Components\Serialization\SerializableMonoBehaviour.cs" />
@@ -275,6 +285,7 @@
     <Compile Include="Constants\CompatibilityChecker.cs" />
     <Compile Include="Constants\Version.cs" />
     <Compile Include="Events.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OnDemand\CBAttributeMapSODemand.cs" />
     <Compile Include="OnDemand\CBMapTrigger.cs" />
     <Compile Include="OnDemand\ILoadOnDemand.cs" />
@@ -290,9 +301,38 @@
     <Compile Include="RuntimeUtility\RuntimeUtility.cs" />
     <Compile Include="Injector.cs" />
     <Compile Include="RuntimeUtility\DiscoverableObjects.cs" />
+    <Compile Include="RuntimeUtility\SinkingBugFix.cs" />
     <Compile Include="RuntimeUtility\StarLightSwitcher.cs" />
     <Compile Include="RuntimeUtility\MainMenuFixer.cs" />
     <Compile Include="RuntimeUtility\TerrainQualitySetter.cs" />
+    <Compile Include="ShadowMan\CelestialBodySortableByDistance.cs" />
+    <Compile Include="ShadowMan\ShadowMan.cs" />
+    <Compile Include="ShadowMan\Utilities\BufferManager.cs" />
+    <Compile Include="ShadowMan\Utilities\Camera\ScreenCopyCommandBuffer.cs" />
+    <Compile Include="ShadowMan\Utilities\Camera\TweakShadowCascades.cs" />
+    <Compile Include="ShadowMan\Utilities\Camera\WireFrame.cs" />
+    <Compile Include="ShadowMan\Utilities\EVE\EVEReflectionHandler.cs" />
+    <Compile Include="ShadowMan\Utilities\Math\MathUtility.cs" />
+    <Compile Include="ShadowMan\Utilities\Math\Matrix3x3.cs" />
+    <Compile Include="ShadowMan\Utilities\Math\Matrix3x3d.cs" />
+    <Compile Include="ShadowMan\Utilities\Math\Matrix4x4d.cs" />
+    <Compile Include="ShadowMan\Utilities\Math\Quat.cs" />
+    <Compile Include="ShadowMan\Utilities\Math\Vector2d.cs" />
+    <Compile Include="ShadowMan\Utilities\Math\Vector2i.cs" />
+    <Compile Include="ShadowMan\Utilities\Math\Vector3d2.cs" />
+    <Compile Include="ShadowMan\Utilities\Math\Vector4d.cs" />
+    <Compile Include="ShadowMan\Utilities\Misc\IcoSphere.cs" />
+    <Compile Include="ShadowMan\Utilities\Misc\MeshFactory.cs" />
+    <Compile Include="ShadowMan\Utilities\Misc\Utils.cs" />
+    <Compile Include="ShadowMan\Utilities\Occlusion\ShadowMapCopier.cs" />
+    <Compile Include="ShadowMan\Utilities\Occlusion\ShadowMapRetrieveCommandBuffer.cs" />
+    <Compile Include="ShadowMan\Utilities\Occlusion\ShadowMaskCopyCommandBuffer.cs" />
+    <Compile Include="ShadowMan\Utilities\Occlusion\ShadowMaskModulateCommandBuffer.cs" />
+    <Compile Include="ShadowMan\Utilities\Occlusion\ShadowRemoveFadeCommandBuffer.cs" />
+    <Compile Include="ShadowMan\Utilities\ReflectionUtils.cs" />
+    <Compile Include="ShadowMan\Utilities\Shader\RenderTypeFixer.cs" />
+    <Compile Include="ShadowMan\Utilities\Shader\ShaderProperties.cs" />
+    <Compile Include="ShadowMan\Utilities\Shader\ShaderReplacer.cs" />
     <Compile Include="Storage.cs" />
     <Compile Include="Templates.cs" />
     <Compile Include="Configuration\Loader.cs" />
@@ -335,5 +375,20 @@
     <Compile Include="UI\Tools.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\IDisposableAnalyzers.4.0.1\analyzers\dotnet\cs\IDisposableAnalyzers.dll" />
+    <Analyzer Include="..\..\packages\Microsoft.Unity.Analyzers.1.12.0\analyzers\dotnet\cs\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="..\..\packages\ReflectionAnalyzers.0.3.1\analyzers\dotnet\cs\ReflectionAnalyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ShadowMan\Proland\Textures\Atmo\inscatter.raw" />
+    <Content Include="ShadowMan\Proland\Textures\Atmo\irradiance.raw" />
+    <Content Include="ShadowMan\Proland\Textures\Atmo\sunglare.png" />
+    <Content Include="ShadowMan\Proland\Textures\Atmo\transmittance.raw" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

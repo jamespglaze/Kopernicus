@@ -28,6 +28,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using Kopernicus.Components.MaterialWrapper;
+using Kopernicus.Configuration;
 using UnityEngine;
 
 namespace Kopernicus.Components
@@ -39,14 +41,44 @@ namespace Kopernicus.Components
         private PQSLandControl[] _landControls;
         private static FieldInfo lcScatterListField;
         private PQ _quad;
+        private bool createColors = true;
+        private bool createScatter = true;
 
         // I have no idea what Squad did to LandControl but it worked just fine before
         public override void OnSetup()
         {
-            typeof(PQS).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
-                .First(f => f.FieldType == typeof(PQSLandControl)).SetValue(sphere, null);
-            base.OnSetup();
-
+            CelestialBody cb = null;
+            PQSLandControl pqsLC = null;
+            try
+            {
+                cb = FlightGlobals.GetBodyByName(sphere.name);
+            }
+            catch
+            {
+            }
+            try
+            {
+                pqsLC = ((PQSLandControl)typeof(PQS).GetFields(BindingFlags.NonPublic | BindingFlags.Instance).First(f => f.FieldType == typeof(PQSLandControl)).GetValue(sphere));
+                createColors = pqsLC.createColors;
+                createScatter = pqsLC.createScatter;
+            }
+            catch
+            {
+                createColors = true;
+                createScatter = true;
+            }
+            try
+            {
+                if (pqsLC)
+                {
+                    pqsLC.createColors = true;
+                    pqsLC.createScatter = createScatter;
+                }
+            }
+            catch
+            {
+                //woo, no LandControl at all.
+            }
             // Try to cache density values that are used to distribute scatters
             _landControls = sphere.GetComponentsInChildren<PQSLandControl>(true);
             if (lcScatterListField != null)
@@ -54,9 +86,8 @@ namespace Kopernicus.Components
                 return;
             }
 
-            lcScatterListField = typeof(PQSLandControl).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            lcScatterListField = typeof(PQSLandControl).GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
                 .First(f => f.FieldType == typeof(Double[]));
-            Debug.Log(lcScatterListField.Name);
         }
 
         public override void OnQuadPreBuild(PQ quad)
