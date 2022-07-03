@@ -245,6 +245,10 @@ namespace Kopernicus.Components.ModularScatter
                 CreateScatterMeshes(quads[i]);
                 quads[i].mesh.Clear();
             }
+            if (cameraCounter > 60)
+            {
+                cameraCounter = 0;
+            }
 
 
             for (Int32 i = 0; i < scatterObjects.Count; i++)
