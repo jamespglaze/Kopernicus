@@ -1,6 +1,6 @@
 ﻿Kopernicus Bleeding Edge
 ==============================
-June 26, 2022
+July 2nd, 2022
 * Created by: BryceSchroeder and Teknoman117 (aka. Nathaniel R. Lewis)
 * Maintained by: Thomas P., NathanKell and KillAshley
 * Further maintained by Prestja, R-T-B
@@ -9,11 +9,11 @@ June 26, 2022
 
 The Bleeding Edge is where beta code is trialed by fire, so if you want to help: Welcome!  If you want a stable experience, please use the stable brance at https://github.com/Kopernicus/Kopernicus instead.
 
-New in this latest version UBE-82:
+New in this latest version UBE-83:
 
-1.) Brought bleeding edge in line with stable branch in prep for new feature development.
+1.) Experimental scatter system performance improvements.  Testing needed.
 
-2.) es-es localization added.
+2.) Fixed some collider-fixing system logspam in select instances.
 
 Known Bugs:
 
