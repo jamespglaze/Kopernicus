@@ -287,12 +287,13 @@ namespace Kopernicus.Components.ModularScatter
                 try
                 {
                     cameraDistance = Vector3.Distance(quad.transform.position, FlightGlobals.ActiveVessel.transform.position);
+                    inView = ((cameraDistance <= Kopernicus.RuntimeUtility.RuntimeUtility.KopernicusConfig.ScatterDistanceLimit * 1.125) && (quad.isVisible));
                 }
                 catch
                 {
+                    inView = false;
                     return;
                 }
-                inView = ((cameraDistance <= Kopernicus.RuntimeUtility.RuntimeUtility.KopernicusConfig.ScatterDistanceLimit * 1.125) && (quad.isVisible));
             }
             if ((scatterObjects.Count <= scatterCountLimit) && (inView))
             {

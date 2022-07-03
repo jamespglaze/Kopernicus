@@ -9,11 +9,9 @@ July 2nd, 2022
 
 The Bleeding Edge is where beta code is trialed by fire, so if you want to help: Welcome!  If you want a stable experience, please use the stable brance at https://github.com/Kopernicus/Kopernicus instead.
 
-New in this latest version UBE-83:
+New in this latest version UBE-84:
 
-1.) Experimental scatter system performance improvements.  Testing needed.
-
-2.) Fixed some collider-fixing system logspam in select instances.
+1.) Fixed some nullrefs in the experimental scatter system performance improvements, woo.
 
 Known Bugs:
 
