@@ -76,18 +76,18 @@ namespace Kopernicus.RuntimeUtility
         {
             foreach (Collider collider in cb.GetComponentsInChildren<Collider>(true))
             {
-                if (colliderStatus[index].ContainsKey(collider.GetInstanceID()))
+                if (colliderStatus[index].ContainsKey(collider.gameObject.GetInstanceID()))
                 {
-                    collider.enabled = colliderStatus[index][collider.GetInstanceID()];
-                    colliderStatus[index].Remove(collider.GetInstanceID());
+                    collider.enabled = colliderStatus[index][collider.gameObject.GetInstanceID()];
+                    colliderStatus[index].Remove(collider.gameObject.GetInstanceID());
                 }
             }
             foreach (Collider collider in cb.scaledBody.GetComponentsInChildren<Collider>(true))
             {
-                if (colliderStatus[index].ContainsKey(collider.GetInstanceID()))
+                if (colliderStatus[index].ContainsKey(collider.gameObject.GetInstanceID()))
                 {
-                    collider.enabled = colliderStatus[index][collider.GetInstanceID()];
-                    colliderStatus[index].Remove(collider.GetInstanceID());
+                    collider.enabled = colliderStatus[index][collider.gameObject.GetInstanceID()];
+                    colliderStatus[index].Remove(collider.gameObject.GetInstanceID());
                 }
             }
         }
@@ -95,17 +95,17 @@ namespace Kopernicus.RuntimeUtility
         {
             foreach (Collider collider in cb.GetComponentsInChildren<Collider>(true))
             {
-                if ((!colliderStatus[index].ContainsKey(collider.GetInstanceID())))
+                if ((!colliderStatus[index].ContainsKey(collider.gameObject.GetInstanceID())))
                 {
-                    colliderStatus[index].Add(collider.GetInstanceID(), collider.enabled);
+                    colliderStatus[index].Add(collider.gameObject.GetInstanceID(), collider.enabled);
                 }
                 collider.enabled = false;
             }
             foreach (Collider collider in cb.scaledBody.GetComponentsInChildren<Collider>(true))
             {
-                if (!colliderStatus[index].ContainsKey(collider.GetInstanceID()))
+                if (!colliderStatus[index].ContainsKey(collider.gameObject.GetInstanceID()))
                 {
-                    colliderStatus[index].Add(collider.GetInstanceID(), collider.enabled);
+                    colliderStatus[index].Add(collider.gameObject.GetInstanceID(), collider.enabled);
                 }
                 collider.enabled = false;
             }
@@ -129,14 +129,7 @@ namespace Kopernicus.RuntimeUtility
                 {
                     continue;
                 }
-                try
-                {
-                    RestoreColliderState(cb, i);
-                }
-                catch
-                {
-                    //Guess we couldn't do that?  Keep trying anyways...
-                }
+                RestoreColliderState(cb, i);
             }
         }
     }

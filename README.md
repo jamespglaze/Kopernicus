@@ -1,6 +1,6 @@
 ﻿Kopernicus Bleeding Edge
 ==============================
-July 2nd, 2022
+July 3rd, 2022
 * Created by: BryceSchroeder and Teknoman117 (aka. Nathaniel R. Lewis)
 * Maintained by: Thomas P., NathanKell and KillAshley
 * Further maintained by Prestja, R-T-B
@@ -11,7 +11,11 @@ The Bleeding Edge is where beta code is trialed by fire, so if you want to help:
 
 New in this latest version UBE-84:
 
-1.) Fixed some nullrefs in the experimental scatter system performance improvements, woo.
+1.) Rewrote large parts of the scatter system to use a new clever caching logic developed in conjunction with @gotmachine.  Major thanks to him, as this realizes major performance benefits!
+
+2.) Fixed yet a few more nullrefs leftover from the last set of optimizations.
+
+3.) Kopernicus_Config.cfg parameters ScatterDistanceLimit and ScatterCountLimit are removed, and will be scrubbed from your cfgs automatically.  This level of tweaking is no longer needed or required with the new high performance scatter system.
 
 Known Bugs:
 
