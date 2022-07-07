@@ -1,6 +1,6 @@
 ﻿Kopernicus Bleeding Edge
 ==============================
-July 3rd, 2022
+July 7th, 2022
 * Created by: BryceSchroeder and Teknoman117 (aka. Nathaniel R. Lewis)
 * Maintained by: Thomas P., NathanKell and KillAshley
 * Further maintained by Prestja, R-T-B
@@ -38,3 +38,20 @@ Known Caveats:
 4.) As of Release-119, LandControl createColors is no longer obeyed, it is forced on to avoid another bug.  Very few mods to my knowledge use this parameter, but a few do (JNSQ for example).  You can work around this if affected by setting your LandControl color to be all zeroes. See attatched cfg for a mod that does this.
 
 5.) The "collider fix" as it's called, which fixes the event in which you sink into the terrain on distant bodies, is off by default.  If you have a system larger than stock, please see Kopernicus_Config.cfg option DisableFarAwayColliders, read about the fix/workaround, and set it as you feel appropriate.
+
+Building
+----------
+To build Kopernicus from source, **don't edit the project file**.
+
+Instead, define a **Reference Path** pointing to the **root** of your local KSP install.
+
+In Visual Studio and Rider, this can be done within the IDE UI, by going to the project properties window and then in the `Reference Path` tab.
+If you want to set it manually, create a `Kopernicus.csproj.user` file next to the `src\Kopernicus\Kopernicus.csproj` file with the following content :
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ReferencePath>Absolute\Path\To\Your\KSP\Install\Folder\Root\</ReferencePath>
+  </PropertyGroup>
+</Project>
+```
