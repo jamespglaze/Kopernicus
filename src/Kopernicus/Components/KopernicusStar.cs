@@ -71,6 +71,11 @@ namespace Kopernicus.Components
         public static KopernicusStar Current;
 
         /// <summary>
+        /// The SMA of the home body for purposes of SolarLuminosityAtHome calculations
+        /// </summary>
+        public static double HomeBodySMA;
+
+        /// <summary>
         /// The sunlight
         /// </summary>
         public Light light;
@@ -90,6 +95,10 @@ namespace Kopernicus.Components
         /// </summary>
         public KopernicusSunFlare lensFlare;
 
+        /// <summary>
+        /// A cache of base.name to avoid string allocations
+        /// </summary>
+        public string StarName;
 
         /// <summary>
         /// Returns the star the given body orbits
@@ -102,7 +111,7 @@ namespace Kopernicus.Components
             {
                 KopernicusStar star = KopernicusStar.Stars[i];
                 double distance = Vector3d.Distance(body.position, star.sun.position);
-                if (star.shifter.givesOffLight && distance > greatestDistance)
+                if (((star.shifter.givesOffLight) && (star.shifter.solarLuminosity > 0)) && distance > greatestDistance)
                 {
                     greatestDistance = distance;
                     nearestStar = star;
@@ -123,7 +132,7 @@ namespace Kopernicus.Components
                 KopernicusStar star = KopernicusStar.Stars[i];
                 double distance = Vector3d.Distance(body.position, star.sun.position);
                 double aparentLuminosity = 0;
-                if (star.shifter.givesOffLight)
+                if ((star.shifter.givesOffLight) && (star.shifter.solarLuminosity > 0))
                 {
                     aparentLuminosity = star.shifter.solarLuminosity * (1 / (distance * distance));
                 }
@@ -174,6 +183,8 @@ namespace Kopernicus.Components
                     transform.forward = sunRotation;
                 }
             };
+
+            StarName = name;
         }
 
         /// <summary>
@@ -355,8 +366,7 @@ namespace Kopernicus.Components
 
             if (directSunlight)
             {
-                Double output = PhysicsGlobals.SolarLuminosity / (12.5663706143592 * realDistanceToSun * realDistanceToSun);
-                return output;
+                return PhysicsGlobals.SolarLuminosity / (12.5663706143592 * realDistanceToSun * realDistanceToSun);
             }
 
             return 0;
@@ -373,25 +383,18 @@ namespace Kopernicus.Components
             CalculatePhysics();
 
             // Get "Correct" values
-            try
-            {
-                flightIntegrator.BaseFICalculateSunBodyFlux();
-            }
-            catch
-            {
-                //Why is this happening?
-            }
+            flightIntegrator.BaseFICalculateSunBodyFlux();
 
             // FI Values
             Boolean directSunlight = flightIntegrator.Vessel.directSunlight;
             Double solarFlux = flightIntegrator.solarFlux;
-            if (!SolarFlux.ContainsKey(Current.name))
+            if (!SolarFlux.ContainsKey(Current.StarName))
             {
-                SolarFlux.Add(Current.name, solarFlux);
+                SolarFlux.Add(Current.StarName, solarFlux);
             }
             else
             {
-                SolarFlux[Current.name] = solarFlux;
+                SolarFlux[Current.StarName] = solarFlux;
             }
 
             // Calculate the values for all bodies
@@ -410,15 +413,19 @@ namespace Kopernicus.Components
                 {
                     directSunlight = true;
                 }
+                else
+                {
+                    directSunlight = false;
+                }
 
                 solarFlux += flux;
-                if (!SolarFlux.ContainsKey(star.name))
+                if (!SolarFlux.ContainsKey(star.StarName))
                 {
-                    SolarFlux.Add(star.name, flux);
+                    SolarFlux.Add(star.StarName, flux);
                 }
                 else
                 {
-                    SolarFlux[star.name] = flux;
+                    SolarFlux[star.StarName] = flux;
                 }
             }
 
@@ -501,21 +508,9 @@ namespace Kopernicus.Components
                 return;
             }
 
-            CelestialBody homeBody = FlightGlobals.GetHomeBody();
-            if (homeBody == null)
-            {
-                return;
-            }
-
-            while (Stars.All(s => s.sun != homeBody.referenceBody) && homeBody.referenceBody != null)
-            {
-                homeBody = homeBody.referenceBody;
-            }
-
-            typeof(PhysicsGlobals).GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
-                .Where(f => f.FieldType == typeof(Double)).Skip(2).First().SetValue(PhysicsGlobals.Instance,
-                    Math.Pow(homeBody.orbit.semiMajorAxis, 2) * 4 * 3.14159265358979 *
-                    PhysicsGlobals.SolarLuminosityAtHome);
+            PhysicsGlobals.Instance.solarLuminosity =
+                Math.Pow(HomeBodySMA, 2) * 4 * 3.14159265358979 *
+                    PhysicsGlobals.SolarLuminosityAtHome;
         }
 
 
@@ -525,9 +520,7 @@ namespace Kopernicus.Components
         /// </summary>
         public static CelestialBody GetLocalStar(CelestialBody body)
         {
-#pragma warning disable UNT0008 // Null propagation on Unity objects
             while (body?.orbit?.referenceBody != null)
-#pragma warning restore UNT0008 // Null propagation on Unity objects
             {
                 if (body.isStar)
                 {
@@ -543,9 +536,7 @@ namespace Kopernicus.Components
         /// </summary>
         public static CelestialBody GetNearestBodyOverSystenRoot(CelestialBody body)
         {
-#pragma warning disable UNT0008 // Null propagation on Unity objects
             while (body?.referenceBody != null)
-#pragma warning restore UNT0008 // Null propagation on Unity objects
             {
                 if (body.referenceBody == FlightGlobals.Bodies[0])
                 {
@@ -561,9 +552,7 @@ namespace Kopernicus.Components
         /// </summary>
         public static CelestialBody GetLocalPlanet(CelestialBody body)
         {
-#pragma warning disable UNT0008 // Null propagation on Unity objects
             while (body?.orbit?.referenceBody != null)
-#pragma warning restore UNT0008 // Null propagation on Unity objects
             {
                 if (body.orbit.referenceBody.isStar)
                 {
