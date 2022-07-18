@@ -64,11 +64,255 @@
       <Name>System.Xml (KSP/Mono)</Name>
       <Private>False</Private>
     </Reference>
-    <Reference Include="$(ManagedPath)\UnityEngine*.dll">
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\..\..\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AccessibilityModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+      <HintPath>..\..\..\..\..\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AIModule.dll">
       <Name>UnityEngine</Name>
       <Private>False</Private>
     </Reference>
-    <Reference Include="$(ManagedPath)\Assembly-CSharp.dll">
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AndroidJNIModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AnimationModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.ARModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AssetBundleModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.AudioModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.ClothModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.ClusterInputModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.ClusterRendererModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.CrashReportingModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.DirectorModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.DSPGraphModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.FileSystemHttpModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.GameCenterModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.GridModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.HotReloadModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.ImageConversionModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.IMGUIModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.InputLegacyModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.InputModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.JSONSerializeModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.LocalizationModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.ParticleSystemModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.PerformanceReportingModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.Physics2DModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.PhysicsModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.ProfilerModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.ScreenCaptureModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.SharedInternalsModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.SpriteMaskModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.SpriteShapeModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.StreamingModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.SubstanceModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.TerrainModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.TerrainPhysicsModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.TextCoreModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.TextRenderingModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.TilemapModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.TLSModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UIElementsModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UIModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UmbraModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UNETModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UnityAnalyticsModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UnityConnectModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UnityTestProtocolModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UnityWebRequestAssetBundleModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UnityWebRequestModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.VehiclesModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.VFXModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.VideoModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.VRModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.WindModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.XRModule.dll">
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="C:\Users\junya\Downloads\Kerbal Space Program\\KSP_x64_Data\Managed\Assembly-CSharp.dll">
       <Name>Assembly-CSharp</Name>
       <Private>False</Private>
     </Reference>
@@ -79,6 +323,15 @@
     <Reference Include="0Harmony, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Lib.Harmony.2.2.1\lib\net472\0Harmony.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\..\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\..\..\..\..\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>..\..\..\..\..\Downloads\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.InputModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -119,6 +372,7 @@
   <!--Source-->
   <ItemGroup>
     <Compile Include="Components\ModularScatter\PQSMod_KopernicusLandClassScatterQuad.cs" />
+    <Compile Include="IniTreeGeneration.cs" />
     <Compile Include="ToolbarButton.cs" />
     <Compile Include="Components\DrawTools.cs" />
     <Compile Include="Components\HazardousBody.cs" />

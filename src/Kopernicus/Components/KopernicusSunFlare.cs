@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Kopernicus Planetary System Modifier
  * ------------------------------------------------------------- 
  * This library is free software; you can redistribute it and/or
@@ -34,9 +34,14 @@ namespace Kopernicus.Components
     /// </summary>
     public class KopernicusSunFlare : SunFlare
     {
+        Node<CelestialBody> thisCelestial;
+        Node<CelestialBody> root;
         protected override void Awake()
         {
             Camera.onPreCull += PreCull;
+            System.Collections.Generic.List<Node<CelestialBody>> l = IniTreeGeneration.GetTree().elements;
+            thisCelestial = l.Find(a => a.item == sun);
+            root = l[0];
         }
 
         [SuppressMessage("ReSharper", "Unity.IncorrectMethodSignature")]
@@ -57,6 +62,52 @@ namespace Kopernicus.Components
             base.OnDestroy();
         }
 
+        private (Boolean, Boolean) CheckRaySphereIntersection(Vector3d rayDir, Vector3d offset, double radius)
+        {
+            double dir = Vector3d.Dot(rayDir, offset);
+            Vector3d ClosestPoint = offset - dir * rayDir;
+            return (ClosestPoint.sqrMagnitude > radius * radius, dir <= 0 && offset.sqrMagnitude > radius * radius);
+        }
+
+        private Boolean RecursiveCheck(Node<CelestialBody> toCheck, Boolean prior)
+        {
+            if (toCheck == null)
+                return prior;
+
+            if (toCheck.item.GetComponent<SphereCollider>() == null)
+                return prior;
+
+            if (!toCheck.item.GetComponent<MeshRenderer>().enabled)
+                return prior;
+
+            if (toCheck == thisCelestial)
+                return prior;
+
+            if (toCheck.item.transform.localScale.x < .001f)
+                return prior;
+            
+            Vector3d targetDistance = PlanetariumCamera.fetch.transform.position - toCheck.item.transform.position;
+            if (toCheck.children == null || toCheck.children.Count == 0) // No children anymore, check itself
+            {
+                (Boolean, Boolean) test = CheckRaySphereIntersection(sunDirection, targetDistance, toCheck.item.Radius / ScaledSpace.ScaleFactor);
+                if (test.Item2) // Behind Object, ignore
+                    return prior;
+                return prior && test.Item1; // Returns either whatever it was told or false.
+            }
+            else
+            {
+                (Boolean, Boolean) test = CheckRaySphereIntersection(sunDirection, targetDistance, toCheck.item.sphereOfInfluence / ScaledSpace.ScaleFactor);
+                if (test.Item2) // Behind SOI, ignore
+                    return prior;
+                if (!test.Item1) // Intersects SOI, check children
+                    foreach (Node<CelestialBody> child in thisCelestial.children)
+                        prior &= RecursiveCheck(child, prior); // Checks children recursively
+                test = CheckRaySphereIntersection(sunDirection, targetDistance, toCheck.item.Radius / ScaledSpace.ScaleFactor);
+                prior &= test.Item1 || test.Item2;
+            }
+            return prior;
+        }
+
         // Overload the stock LateUpdate function
         private void LateUpdate()
         {
@@ -69,6 +120,12 @@ namespace Kopernicus.Components
                                                            ScaledSpace.LocalToScaledSpace(sun.position)) /
                                                        (AU * ScaledSpace.InverseScaleFactor))));
 
+            if (sunFlare.brightness == 0)
+            {
+                SunlightEnabled(false);
+                return;
+            }
+
             if (PlanetariumCamera.fetch.target == null ||
                 HighLogic.LoadedScene != GameScenes.TRACKSTATION && HighLogic.LoadedScene != GameScenes.FLIGHT)
             {
@@ -76,55 +133,9 @@ namespace Kopernicus.Components
             }
 
             Boolean state = true;
+            
             for (Int32 index = 0; index < PlanetariumCamera.fetch.targets.Count; index++)
             {
-                MapObject mapTarget = PlanetariumCamera.fetch.targets[index];
-                if (mapTarget == null)
-                {
-                    continue;
-                }
-
-                if (mapTarget.type != MapObject.ObjectType.CelestialBody)
-                {
-                    continue;
-                }
-
-                if (mapTarget.GetComponent<SphereCollider>() == null)
-                {
-                    continue;
-                }
-
-                if (!mapTarget.GetComponent<MeshRenderer>().enabled)
-                {
-                    continue;
-                }
-
-                if (mapTarget.celestialBody == sun)
-                {
-                    continue;
-                }
-
-                if (mapTarget.transform.localScale.x < 1.0 || mapTarget.transform.localScale.x >= 3.0)
-                {
-                    continue;
-                }
-
-                Vector3d targetDistance = PlanetariumCamera.fetch.transform.position - mapTarget.transform.position;
-                Single radius = mapTarget.GetComponent<SphereCollider>().radius;
-                Double num1 = 2.0 * Vector3d.Dot(-sunDirection, targetDistance);
-                Double num2 = Vector3d.Dot(targetDistance, targetDistance) - radius * (Double) radius;
-                Double d = num1 * num1 - 4.0 * num2;
-                if (d < 0)
-                {
-                    continue;
-                }
-
-                Double num3 = (-num1 + Math.Sqrt(d)) * 0.5;
-                Double num4 = (-num1 - Math.Sqrt(d)) * 0.5;
-                if (num3 >= 0.0 && num4 >= 0.0)
-                {
-                    state = false;
-                }
             }
 
             SunlightEnabled(state);
