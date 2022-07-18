@@ -47,9 +47,7 @@ namespace Kopernicus
         {
             DontDestroyOnLoad(gameObject);
             gameObject.name = "OrbitTreeGenerationObject";
-        }
-        void Start()
-        {
+
             orbitHierarchy = new Tree<CelestialBody>();
             orbitHierarchy.root = new Node<CelestialBody>(FlightGlobals.Bodies[0]);
             List<Node<CelestialBody>> completeList = new List<Node<CelestialBody>>();
