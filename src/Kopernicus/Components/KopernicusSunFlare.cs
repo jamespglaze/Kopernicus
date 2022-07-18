@@ -132,13 +132,7 @@ namespace Kopernicus.Components
                 return;
             }
 
-            Boolean state = true;
-            
-            for (Int32 index = 0; index < PlanetariumCamera.fetch.targets.Count; index++)
-            {
-            }
-
-            SunlightEnabled(state);
+            SunlightEnabled(RecursiveCheck(root, true));
         }
     }
 }
