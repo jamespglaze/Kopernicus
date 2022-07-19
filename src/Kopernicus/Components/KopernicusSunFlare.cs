@@ -24,6 +24,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
@@ -34,14 +35,9 @@ namespace Kopernicus.Components
     /// </summary>
     public class KopernicusSunFlare : SunFlare
     {
-        Node<CelestialBody> thisCelestial;
-        Node<CelestialBody> root;
         protected override void Awake()
         {
             Camera.onPreCull += PreCull;
-            System.Collections.Generic.List<Node<CelestialBody>> l = IniTreeGeneration.GetTree().elements;
-            thisCelestial = l.Find(a => a.item == sun);
-            root = l[0];
         }
 
         [SuppressMessage("ReSharper", "Unity.IncorrectMethodSignature")]
@@ -62,52 +58,40 @@ namespace Kopernicus.Components
             base.OnDestroy();
         }
 
-        private (Boolean, Boolean) CheckRaySphereIntersection(Vector3d rayDir, Vector3d offset, double radius)
+        [Obsolete("Unused by any script")]
+        private bool CheckRaySphereIntersection(Vector3d rayDir, Vector3d offset, double radius)
         {
             double dir = Vector3d.Dot(rayDir, offset);
             Vector3d ClosestPoint = offset - dir * rayDir;
-            return (ClosestPoint.sqrMagnitude > radius * radius, dir <= 0 && offset.sqrMagnitude > radius * radius);
+            return ClosestPoint.sqrMagnitude > radius * radius || (dir <= 0 && offset.sqrMagnitude > radius * radius);
         }
-
-        private Boolean RecursiveCheck(Node<CelestialBody> toCheck, Boolean prior)
+        [Obsolete("Does not work as intended")]
+        private Boolean RecursiveCheck(CelestialBody toCheck, Boolean prior, Vector3d toCamera)
         {
             if (toCheck == null)
                 return prior;
-
-            if (toCheck.item.GetComponent<SphereCollider>() == null)
-                return prior;
-
-            if (!toCheck.item.GetComponent<MeshRenderer>().enabled)
-                return prior;
-
-            if (toCheck == thisCelestial)
-                return prior;
-
-            if (toCheck.item.transform.localScale.x < .001f)
-                return prior;
-            
-            Vector3d targetDistance = PlanetariumCamera.fetch.transform.position - toCheck.item.transform.position;
-            if (toCheck.children == null || toCheck.children.Count == 0) // No children anymore, check itself
+            List<CelestialBody> children = toCheck.orbitingBodies;
+            if (toCheck == sun)
             {
-                (Boolean, Boolean) test = CheckRaySphereIntersection(sunDirection, targetDistance, toCheck.item.Radius / ScaledSpace.ScaleFactor);
-                if (test.Item2) // Behind Object, ignore
+                if (children == null || children.Count == 0)
                     return prior;
-                return prior && test.Item1; // Returns either whatever it was told or false.
+                foreach (CelestialBody b in children)
+                    prior &= RecursiveCheck(b, prior, toCamera);
+                return prior;
             }
-            else
-            {
-                (Boolean, Boolean) test = CheckRaySphereIntersection(sunDirection, targetDistance, toCheck.item.sphereOfInfluence / ScaledSpace.ScaleFactor);
-                if (test.Item2) // Behind SOI, ignore
-                    return prior;
-                if (!test.Item1) // Intersects SOI, check children
-                    foreach (Node<CelestialBody> child in thisCelestial.children)
-                        prior &= RecursiveCheck(child, prior); // Checks children recursively
-                test = CheckRaySphereIntersection(sunDirection, targetDistance, toCheck.item.Radius / ScaledSpace.ScaleFactor);
-                prior &= test.Item1 || test.Item2;
-            }
+            Vector3d targetDistance = PlanetariumCamera.fetch.transform.position - toCheck.transform.position;
+            prior &= CheckRaySphereIntersection(toCamera, targetDistance, toCheck.Radius / ScaledSpace.ScaleFactor);
+            if (prior && children != null && children.Count != 0)
+                if (!CheckRaySphereIntersection(toCamera, targetDistance, toCheck.sphereOfInfluence / ScaledSpace.ScaleFactor))
+                    foreach (CelestialBody b in children)
+                        prior &= RecursiveCheck(b, prior, toCamera);
             return prior;
         }
 
+        private void Start()
+        {
+            sunFlare.fadeSpeed = 10000f;
+        }
         // Overload the stock LateUpdate function
         private void LateUpdate()
         {
@@ -120,19 +104,11 @@ namespace Kopernicus.Components
                                                            ScaledSpace.LocalToScaledSpace(sun.position)) /
                                                        (AU * ScaledSpace.InverseScaleFactor))));
 
-            if (sunFlare.brightness == 0)
-            {
-                SunlightEnabled(false);
-                return;
-            }
-
             if (PlanetariumCamera.fetch.target == null ||
                 HighLogic.LoadedScene != GameScenes.TRACKSTATION && HighLogic.LoadedScene != GameScenes.FLIGHT)
             {
                 return;
             }
-
-            SunlightEnabled(RecursiveCheck(root, true));
         }
     }
 }

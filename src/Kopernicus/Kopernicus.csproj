@@ -372,7 +372,6 @@
   <!--Source-->
   <ItemGroup>
     <Compile Include="Components\ModularScatter\PQSMod_KopernicusLandClassScatterQuad.cs" />
-    <Compile Include="IniTreeGeneration.cs" />
     <Compile Include="ToolbarButton.cs" />
     <Compile Include="Components\DrawTools.cs" />
     <Compile Include="Components\HazardousBody.cs" />
