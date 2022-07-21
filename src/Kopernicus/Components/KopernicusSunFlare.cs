@@ -69,14 +69,10 @@ namespace Kopernicus.Components
         {
             MapObject mapTarget = b.MapObject;
             if (mapTarget == null)
-            {
                 return density;
-            }
 
             if (!mapTarget.GetComponent<MeshRenderer>().enabled)
-            {
                 return density;
-            }
 
             if (mapTarget.celestialBody == sun)
             {
@@ -108,10 +104,10 @@ namespace Kopernicus.Components
         {
             Vector3d cameraPosition = (PlanetariumCamera.fetch.transform.position - sun.transform.position).normalized;
             float density = CheckAtmoDensity(FlightGlobals.Bodies[0], 0f, cameraPosition);
-            density = Mathf.Sqrt(density / 200f);
-            float r = 1f;
-            float g = Mathf.Exp(-density * .8f);
-            float b = Mathf.Exp(-density * 2.3f);
+            density = Mathf.Sqrt(density / 150f);
+            float r = Mathf.Exp(.1f - density * .3f);
+            float g = Mathf.Exp(.1f - density * 1.1f);
+            float b = Mathf.Exp(.1f - density * 2.6f);
             sunFlare.color = new Color(r, g, b);
         }
 
