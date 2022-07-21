@@ -58,43 +58,67 @@ namespace Kopernicus.Components
             base.OnDestroy();
         }
 
-        [Obsolete("Unused by any script")]
-        private bool CheckRaySphereIntersection(Vector3d rayDir, Vector3d offset, double radius)
+        private double CheckRaySphereIntersection(Vector3d rayDir, Vector3d offset, double radius)
         {
             double dir = Vector3d.Dot(rayDir, offset);
-            Vector3d ClosestPoint = offset - dir * rayDir;
-            return ClosestPoint.sqrMagnitude > radius * radius || (dir <= 0 && offset.sqrMagnitude > radius * radius);
-        }
-        [Obsolete("Does not work as intended")]
-        private Boolean RecursiveCheck(CelestialBody toCheck, Boolean prior, Vector3d toCamera)
-        {
-            if (toCheck == null)
-                return prior;
-            List<CelestialBody> children = toCheck.orbitingBodies;
-            if (toCheck == sun)
-            {
-                if (children == null || children.Count == 0)
-                    return prior;
-                foreach (CelestialBody b in children)
-                    prior &= RecursiveCheck(b, prior, toCamera);
-                return prior;
-            }
-            Vector3d targetDistance = PlanetariumCamera.fetch.transform.position - toCheck.transform.position;
-            prior &= CheckRaySphereIntersection(toCamera, targetDistance, toCheck.Radius / ScaledSpace.ScaleFactor);
-            if (prior && children != null && children.Count != 0)
-                if (!CheckRaySphereIntersection(toCamera, targetDistance, toCheck.sphereOfInfluence / ScaledSpace.ScaleFactor))
-                    foreach (CelestialBody b in children)
-                        prior &= RecursiveCheck(b, prior, toCamera);
-            return prior;
+            Vector3d ClosestPoint = offset - Math.Max(dir, 0d) * rayDir;
+            return ClosestPoint.magnitude - radius;
         }
 
-        private void Start()
+        private float CheckAtmoDensity(CelestialBody b, float density, Vector3d cameraPosition)
         {
-            sunFlare.fadeSpeed = 10000f;
+            MapObject mapTarget = b.MapObject;
+            if (mapTarget == null)
+            {
+                return density;
+            }
+
+            if (!mapTarget.GetComponent<MeshRenderer>().enabled)
+            {
+                return density;
+            }
+
+            if (mapTarget.celestialBody == sun)
+            {
+                foreach (CelestialBody n in b.orbitingBodies)
+                    density += CheckAtmoDensity(n, 0f, cameraPosition);
+                return density;
+            }
+
+            Vector3d targetDistance = PlanetariumCamera.fetch.transform.position - mapTarget.transform.position;
+            if (b.atmosphere)
+            {
+                float altitude = (float)CheckRaySphereIntersection(cameraPosition, targetDistance * ScaledSpace.ScaleFactor, b.Radius);
+                FloatCurve curve = b.atmospherePressureCurve;
+                density += curve.Evaluate(Mathf.Clamp(altitude, curve.minTime, curve.maxTime));
+            }
+            
+            if (b.orbitingBodies.Count != 0)
+            {
+                if (CheckRaySphereIntersection(cameraPosition, targetDistance * ScaledSpace.ScaleFactor, b.sphereOfInfluence) > 0)
+                    return density;
+
+                foreach (CelestialBody n in b.orbitingBodies)
+                    density += CheckAtmoDensity(n, 0f, cameraPosition);
+            }
+            return density;
         }
+
+        private void AtmosphericScattering()
+        {
+            Vector3d cameraPosition = (PlanetariumCamera.fetch.transform.position - sun.transform.position).normalized;
+            float density = CheckAtmoDensity(FlightGlobals.Bodies[0], 0f, cameraPosition);
+            density = Mathf.Sqrt(density / 200f);
+            float r = 1f;
+            float g = Mathf.Exp(-density * .8f);
+            float b = Mathf.Exp(-density * 2.3f);
+            sunFlare.color = new Color(r, g, b);
+        }
+
         // Overload the stock LateUpdate function
         private void LateUpdate()
         {
+            sunFlare.fadeSpeed = 10000f;
             Vector3d position = target.position;
             sunDirection = (position - ScaledSpace.LocalToScaledSpace(sun.position)).normalized;
             transform.forward = sunDirection;
@@ -109,6 +133,9 @@ namespace Kopernicus.Components
             {
                 return;
             }
+
+            if (RuntimeUtility.RuntimeUtility.KopernicusConfig.EnableAtmosphericExtinction)
+                AtmosphericScattering();
         }
     }
 }

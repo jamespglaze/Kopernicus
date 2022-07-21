@@ -46,6 +46,45 @@ using UnityEngine.UI;
 using KSP.Localization;
 using Object = UnityEngine.Object;
 
+namespace Kopernicus
+{
+    public class Node<T>
+    {
+        public T data;
+        public Node<T> parent;
+        public List<Node<T>> children;
+
+        public void AddChildren(Node<T> obj)
+        {
+            if (obj == this)
+                return;
+            obj.parent = this;
+            if (children == null)
+                children = new List<Node<T>>();
+            children.Add(obj);
+        }
+        public void RemoveChildren(Node<T> obj)
+        {
+            obj.parent = null;
+            if (children == null || children.Count == 0)
+            {
+                children = new List<Node<T>>();
+                return;
+            }
+            children.Remove(obj);
+        }
+        public void AddToParent(Node<T> parent)
+        {
+            if (parent == this)
+                return;
+            if (parent.children == null)
+                parent.children = new List<Node<T>>();
+            this.parent = parent;
+            parent.children.Add(this);
+        }
+    }
+}
+
 namespace Kopernicus.RuntimeUtility
 {
     // Mod runtime utilities
