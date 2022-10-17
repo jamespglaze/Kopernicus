@@ -316,10 +316,14 @@ namespace Kopernicus.Components
             // Get sunVector
             Boolean directSunlight = false;
             Vector3 integratorPosition = vessel.transform.position;
+
+            Vector3d truePosition = vessel.GetWorldPos3D();
+            Vector3d sunPosition = sun.position;
+
             Vector3d scaledSpace = ScaledSpace.LocalToScaledSpace(integratorPosition);
-            Vector3 position = sun.scaledBody.transform.position;
-            Double scale = Math.Max((position - scaledSpace).magnitude, 1);
-            Vector3 sunVector = (position - scaledSpace) / scale;
+            Vector3d position = ScaledSpace.LocalToScaledSpace(sun.scaledBody.transform.position);
+            
+            Vector3 sunVector = (position - scaledSpace).normalized;
             Ray ray = new Ray(ScaledSpace.LocalToScaledSpace(integratorPosition), sunVector);
 
             // Get Thermal Stats
@@ -332,23 +336,21 @@ namespace Kopernicus.Components
                 }
             }
 
-            // Get Solar Flux
+            // Get True Solar Flux
             Double realDistanceToSun = 0;
+            double solarRad = sun.Radius;
             if (!Physics.Raycast(ray, out RaycastHit raycastHit, Single.MaxValue, ModularFlightIntegrator.SunLayerMask))
             {
                 directSunlight = true;
-                realDistanceToSun = scale * ScaledSpace.ScaleFactor - sun.Radius;
+                realDistanceToSun = (truePosition - sunPosition).magnitude;
             }
             else if (raycastHit.transform.GetComponent<ScaledMovement>().celestialBody == sun)
             {
-                realDistanceToSun = ScaledSpace.ScaleFactor * raycastHit.distance;
+                realDistanceToSun = ScaledSpace.ScaleFactor * raycastHit.distance + solarRad;
                 directSunlight = true;
             }
-
             if (directSunlight)
-            {
-                return PhysicsGlobals.SolarLuminosity / (12.5663706143592 * realDistanceToSun * realDistanceToSun);
-            }
+                return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d);
 
             return 0;
         }
@@ -363,51 +365,34 @@ namespace Kopernicus.Components
             PhysicsGlobals.SolarInsolationAtHome = Current.shifter.solarInsolation;
             CalculatePhysics();
 
-            // Get "Correct" values
+            // Calculate but discard some values anyway since it's broken
             flightIntegrator.BaseFICalculateSunBodyFlux();
 
-            // FI Values
-            Boolean directSunlight = flightIntegrator.Vessel.directSunlight;
-            Double solarFlux = flightIntegrator.solarFlux;
-            if (!SolarFlux.ContainsKey(Current.StarName))
-            {
-                SolarFlux.Add(Current.StarName, solarFlux);
-            }
-            else
-            {
-                SolarFlux[Current.StarName] = solarFlux;
-            }
-
+            // Ignore broken FI values
+            Boolean directSunlight = false;
+            Double solarFlux = 0d;
             // Calculate the values for all bodies
-            foreach (KopernicusStar star in Stars.Where(s => s.sun != FlightIntegrator.sunBody))
+            foreach (KopernicusStar star in Stars)
             {
                 // Set Physics
                 PhysicsGlobals.SolarLuminosityAtHome = star.shifter.solarLuminosity;
                 PhysicsGlobals.SolarInsolationAtHome = star.shifter.solarInsolation;
-                CalculatePhysics();
+
+                //Useless applied per star as it is a static method.
+                //CalculatePhysics();
 
                 // Calculate Flux
                 Double flux = Flux(flightIntegrator, star);
 
                 // And save them
                 if (flux > 0)
-                {
                     directSunlight = true;
-                }
-                else
-                {
-                    directSunlight = false;
-                }
 
                 solarFlux += flux;
                 if (!SolarFlux.ContainsKey(star.StarName))
-                {
                     SolarFlux.Add(star.StarName, flux);
-                }
                 else
-                {
                     SolarFlux[star.StarName] = flux;
-                }
             }
 
             // Reapply
@@ -445,28 +430,32 @@ namespace Kopernicus.Components
                 // Get sunVector
                 Boolean directSunlight = false;
                 Vector3 integratorPosition = fi.transform.position;
+
+                Vector3d truePosition = fi.Vessel.GetWorldPos3D();
+                Vector3d sunPosition = star.sun.position;
+
                 Vector3d scaledSpace = ScaledSpace.LocalToScaledSpace(integratorPosition);
-                Vector3 position = star.sun.scaledBody.transform.position;
-                Double scale = Math.Max((position - scaledSpace).magnitude, 1);
-                Vector3 sunVector = (position - scaledSpace) / scale;
+                Vector3d position = ScaledSpace.LocalToScaledSpace(star.sun.scaledBody.transform.position);
+
+                Vector3 sunVector = (position - scaledSpace).normalized;
                 Ray ray = new Ray(ScaledSpace.LocalToScaledSpace(integratorPosition), sunVector);
 
                 // Get Solar Flux
                 Double realDistanceToSun = 0;
+                double solarRad = star.sun.Radius;
                 if (!Physics.Raycast(ray, out RaycastHit raycastHit, Single.MaxValue, ModularFlightIntegrator.SunLayerMask))
                 {
                     directSunlight = true;
-                    realDistanceToSun = scale * ScaledSpace.ScaleFactor - star.sun.Radius;
+                    realDistanceToSun = (truePosition - sunPosition).magnitude;
                 }
                 else if (raycastHit.transform.GetComponent<ScaledMovement>().celestialBody == star.sun)
                 {
-                    realDistanceToSun = ScaledSpace.ScaleFactor * raycastHit.distance;
+                    realDistanceToSun = ScaledSpace.ScaleFactor * raycastHit.distance + solarRad;
                     directSunlight = true;
                 }
-
                 if (directSunlight)
                 {
-                    return PhysicsGlobals.SolarLuminosity / (12.5663706143592 * realDistanceToSun * realDistanceToSun);
+                    return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d);
                 }
 
                 return 0;

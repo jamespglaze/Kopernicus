@@ -110,6 +110,7 @@ namespace Kopernicus.RuntimeUtility
             }
         }
         public static ConfigReader KopernicusConfig = new Kopernicus.Configuration.ConfigReader();
+        public static List<KopernicusStar> starsMostToLeastBright;
         // Awake() - flag this class as don't destroy on load and register delegates
         [SuppressMessage("ReSharper", "ConvertClosureToMethodGroup")]
         private void Awake()
@@ -184,6 +185,60 @@ namespace Kopernicus.RuntimeUtility
             return list;
         }
 
+        private void GenerateSortedListOfStars()
+        {
+            starsMostToLeastBright = new List<KopernicusStar>();
+            List<List<KopernicusStar>> orderedSuperList = new List<List<KopernicusStar>>();
+            orderedSuperList.Add(KopernicusStar.Stars);
+            orderedSuperList = RecursiveQuickSort(orderedSuperList);
+            for (int i = 0; i < orderedSuperList.Count; i++)
+            {
+                List<KopernicusStar> orderList = orderedSuperList[i];
+                starsMostToLeastBright.AddRange(orderList);
+            }
+        }
+
+        List<List<KopernicusStar>> RecursiveQuickSort(List<List<KopernicusStar>> priorIter)
+        {
+            List<List<KopernicusStar>> nextLayer = new List<List<KopernicusStar>>();
+            for (int i = 0; i < priorIter.Count; i++)
+            {
+                List<KopernicusStar> sublist = priorIter[i];
+                if (sublist.Count <= 1)
+                {
+                    nextLayer.Add(sublist);
+                    continue;
+                }
+                (List<KopernicusStar>, List<KopernicusStar>) partition = Partition(sublist);
+                nextLayer.Add(partition.Item1);
+                nextLayer.Add(partition.Item2);
+            }
+            if (nextLayer.Count > priorIter.Count) // Results have not converged
+                return RecursiveQuickSort(nextLayer);
+            return nextLayer;
+        }
+
+        (List<KopernicusStar>, List<KopernicusStar>) Partition(List<KopernicusStar> s)
+        {
+            int indexOfDivider = UnityEngine.Random.Range(0, s.Count - 1);
+            double cutThreshold = s[indexOfDivider].shifter.solarLuminosity;
+            List<KopernicusStar> most = new List<KopernicusStar>();
+            List<KopernicusStar> least = new List<KopernicusStar>();
+            foreach (KopernicusStar star in s)
+            {
+                if (star.shifter.solarLuminosity > cutThreshold)
+                    most.Add(star);
+                else
+                    least.Add(star);
+            }
+            if (most.Count == 0)// Divider chosen was the most
+            {
+                most.Add(s[indexOfDivider]);
+                least.Remove(s[indexOfDivider]);
+            }
+            return (most, least);
+        }
+
         // Execute MainMenu functions
         private void Start()
         {
@@ -200,8 +255,8 @@ namespace Kopernicus.RuntimeUtility
             {
                 ApplyStarPatches(PSystemManager.Instance.localBodies[i]);
             }
-
             CalculateHomeBodySMA();
+            GenerateSortedListOfStars();
         }
 
         // Stuff
@@ -798,7 +853,6 @@ namespace Kopernicus.RuntimeUtility
             {
                 return;
             }
-
             GameObject star = KopernicusStar.GetBrightest(body).gameObject;
             Vector3 afgCamPosition = body.afg.mainCamera.transform.position;
             Vector3 distance = body.scaledBody.transform.position - afgCamPosition;
