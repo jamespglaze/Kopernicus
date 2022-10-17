@@ -454,9 +454,7 @@ namespace Kopernicus.Components
                     directSunlight = true;
                 }
                 if (directSunlight)
-                {
                     return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d);
-                }
 
                 return 0;
             }
