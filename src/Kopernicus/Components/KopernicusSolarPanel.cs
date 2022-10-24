@@ -68,12 +68,15 @@ namespace Kopernicus.Components
             frameTimer++;
             if (HighLogic.LoadedSceneIsFlight)
             {
-                if ((deployState == ModuleDeployablePart.DeployState.EXTENDED))
+                if (deployState == ModuleDeployablePart.DeployState.EXTENDED)
                 {
                     if (frameTimer > (50 * Kopernicus.RuntimeUtility.RuntimeUtility.KopernicusConfig.SolarRefreshRate))
                     {
                         CelestialBody trackingStar = trackingBody;
-                        frameTimer = 0;
+
+                        //Makes solar panel updating stochastic and spread-out throughout the update time. Reduces lag spikes and makes updating more even.
+                        frameTimer = UnityEngine.Random.Range(-Kopernicus.RuntimeUtility.RuntimeUtility.KopernicusConfig.SolarRefreshRate * 25 - 1, Kopernicus.RuntimeUtility.RuntimeUtility.KopernicusConfig.SolarRefreshRate * 25);
+
                         KopernicusStar bestStar = KopernicusStar.CelestialBodies[trackingStar];
                         Double totalFlux = 0;
                         Double totalFlow = 0;
@@ -343,6 +346,7 @@ namespace Kopernicus.Components
             }
         }
 
+        //Use this instead (just doesn't work on my machine personally so I commented it out)
         //public new void OnDestroy()
         //{
         //    base.OnDestroy();
