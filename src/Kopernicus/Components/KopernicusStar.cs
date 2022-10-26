@@ -335,12 +335,10 @@ namespace Kopernicus.Components
 
             Vector3d truePosition = vessel.GetWorldPos3D();
             Vector3d sunPosition = sun.position;
-
             Vector3d scaledSpace = ScaledSpace.LocalToScaledSpace(integratorPosition);
-            Vector3d position = ScaledSpace.LocalToScaledSpace(sun.scaledBody.transform.position);
-            
-            Vector3 sunVector = (position - scaledSpace).normalized;
-            Ray ray = new Ray(ScaledSpace.LocalToScaledSpace(integratorPosition), sunVector);
+
+            Vector3d sunVector = (sunPosition - truePosition).normalized;
+            Ray ray = new Ray(scaledSpace, sunVector);
 
             // Get Thermal Stats
             if (vessel.mainBody.atmosphere)
@@ -353,7 +351,7 @@ namespace Kopernicus.Components
             }
 
             // Get True Solar Flux
-            Double realDistanceToSun = 0;
+            Double realDistanceToSun = 1E+19d;
             double solarRad = sun.Radius;
             if (!Physics.Raycast(ray, out RaycastHit raycastHit, Single.MaxValue, ModularFlightIntegrator.SunLayerMask))
             {
@@ -452,15 +450,13 @@ namespace Kopernicus.Components
 
                 Vector3d truePosition = fi.Vessel.GetWorldPos3D();
                 Vector3d sunPosition = star.sun.position;
-
                 Vector3d scaledSpace = ScaledSpace.LocalToScaledSpace(integratorPosition);
-                Vector3d position = ScaledSpace.LocalToScaledSpace(star.sun.scaledBody.transform.position);
 
-                Vector3 sunVector = (position - scaledSpace).normalized;
-                Ray ray = new Ray(ScaledSpace.LocalToScaledSpace(integratorPosition), sunVector);
+                Vector3d sunVector = (sunPosition - truePosition).normalized;
+                Ray ray = new Ray(scaledSpace, sunVector);
 
                 // Get Solar Flux
-                Double realDistanceToSun = 0;
+                Double realDistanceToSun = 1E+19d;
                 double solarRad = star.sun.Radius;
                 if (!Physics.Raycast(ray, out RaycastHit raycastHit, Single.MaxValue, ModularFlightIntegrator.SunLayerMask))
                 {
