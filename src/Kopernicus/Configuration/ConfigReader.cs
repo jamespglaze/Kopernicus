@@ -63,7 +63,9 @@ namespace Kopernicus.Configuration
         [Persistent]
         public float SettingsWindowYcoord = 0;
         [Persistent]
-        public bool EnableAtmosphericExtinction = false;
+        public bool EnableVisualAtmosphericExtinction = false;
+        [Persistent]
+        public bool EnablePhysicalAtmosphericExtinction = false;
 
         public UrlDir.UrlConfig[] baseConfigs;
         public void loadMainSettings()
@@ -96,7 +98,8 @@ namespace Kopernicus.Configuration
                 Debug.Log("DisableFarAwayColliders: " + DisableFarAwayColliders);
                 Debug.Log("SettingsWindowXcoord: " + SettingsWindowXcoord);
                 Debug.Log("SettingsWindowYcoord: " + SettingsWindowYcoord);
-                Debug.Log("EnableAtmosphericExtinction: " + EnableAtmosphericExtinction);
+                Debug.Log("EnableVisualAtmosphericExtinction: " + EnableVisualAtmosphericExtinction);
+                Debug.Log("EnablePhysicalAtmosphericExtinction: " + EnablePhysicalAtmosphericExtinction);
             }
             catch
             {

@@ -1180,7 +1180,8 @@ namespace Kopernicus.RuntimeUtility
                     configFile.WriteLine("	DisableFarAwayColliders = False //Boolean.  Disables distant colliders farther away than stock eeloo. This fixes the distant body sinking bug, but keeping track of the collider state has a slight performance penalty. Advised to use only in larger than stock systems. Be advised this breaks raycasts beyond stock eeloo range.");
                     configFile.WriteLine("	SettingsWindowXcoord = 0");
                     configFile.WriteLine("	SettingsWindowYcoord = 0");
-                    configFile.WriteLine("	EnableAtmosphericExtinction = False");
+                    configFile.WriteLine("	EnableVisualAtmosphericExtinction = False //Boolean. Enables lens flares to be tinted by atmospheric extinction");
+                    configFile.WriteLine("	EnablePhysicalAtmosphericExtinction = False //Boolean. Enables atmospheric extinction for solar panels and thermal flux.");
                     configFile.WriteLine("}");
                     configFile.Flush();
                     configFile.Close();
@@ -1222,7 +1223,8 @@ namespace Kopernicus.RuntimeUtility
                     configFile.WriteLine("	DisableFarAwayColliders  = " + KopernicusConfig.DisableFarAwayColliders.ToString() + " //Boolean.  Disables distant colliders farther away than stock eeloo. This fixes the distant body sinking bug, but keeping track of the collider state has a slight performance penalty. Advised to use only in larger than stock systems. Be advised this breaks raycasts beyond stock eeloo range.");
                     configFile.WriteLine("	SettingsWindowXcoord = " + KopernicusConfig.SettingsWindowXcoord.ToString());
                     configFile.WriteLine("	SettingsWindowYcoord = " + KopernicusConfig.SettingsWindowYcoord.ToString());
-                    configFile.WriteLine("	EnableAtmosphericExtinction = " + KopernicusConfig.EnableAtmosphericExtinction.ToString());
+                    configFile.WriteLine("	EnableVisualAtmosphericExtinction = " + KopernicusConfig.EnableVisualAtmosphericExtinction.ToString() + " //Boolean. Enables lens flares to be tinted by atmospheric extinction. Disable when using a mod like Scatterer.");
+                    configFile.WriteLine("	EnablePhysicalAtmosphericExtinction = " + KopernicusConfig.EnablePhysicalAtmosphericExtinction.ToString() + " //Boolean. Enables atmospheric extinction for solar panels and thermal flux.");
                     configFile.WriteLine("}");
                     configFile.Flush();
                     configFile.Close();

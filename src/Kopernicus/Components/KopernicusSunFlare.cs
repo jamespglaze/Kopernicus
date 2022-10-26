@@ -94,7 +94,7 @@ namespace Kopernicus.Components
                 return;
             }
 
-            if (RuntimeUtility.RuntimeUtility.KopernicusConfig.EnableAtmosphericExtinction)
+            if (RuntimeUtility.RuntimeUtility.KopernicusConfig.EnableVisualAtmosphericExtinction)
                 AtmosphericScattering();
         }
     }
