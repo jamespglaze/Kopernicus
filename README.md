@@ -1,6 +1,6 @@
 ﻿Kopernicus Bleeding Edge
 ==============================
-July 7th, 2022
+October 22nd, 2022
 * Created by: BryceSchroeder and Teknoman117 (aka. Nathaniel R. Lewis)
 * Maintained by: Thomas P., NathanKell and KillAshley
 * Further maintained by Prestja, R-T-B
@@ -10,13 +10,9 @@ July 7th, 2022
 
 The Bleeding Edge is where beta code is trialed by fire, so if you want to help: Welcome!  If you want a stable experience, please use the stable brance at https://github.com/Kopernicus/Kopernicus instead.
 
-New in this latest version UBE-85:
+New in this latest version UBE-86 (beta 1 of stable release-140):
 
-1.) Rewrote large parts of the scatter system to use a new clever caching logic developed in conjunction with @gotmachine.  Major thanks to him, as this realizes major performance benefits!
-
-2.) Kopernicus_Config.cfg parameters ScatterDistanceLimit and ScatterCountLimit are removed, and will be scrubbed from your cfgs automatically.  This level of tweaking is no longer needed or required with the new high performance scatter system.
-
-3.) We now depend on KSPHarmony framework to do a few small things that would be messy to do via reflection.  Please ensure you extract your release zip fully, it includes everything you need.
+1.) Beta release testing new flux logic and some hazbod fixes.  Please test so we can mainline this and find any bugs asap!
 
 Known Bugs:
 

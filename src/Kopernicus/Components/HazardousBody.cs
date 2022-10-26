@@ -94,7 +94,6 @@ namespace Kopernicus.Components
                 if (biomeName != biome)
                     return;
             }
-
             Double altitude = altitudeCurve.Evaluate((Single)Vector3d.Distance(vessel.transform.position, _body.transform.position));
             Double latitude = latitudeCurve.Evaluate((Single)vessel.latitude);
             Double longitude = longitudeCurve.Evaluate((Single)vessel.longitude);

@@ -39,9 +39,9 @@ namespace Kopernicus.Constants
             get
             {
 #if (!KSP_VERSION_1_8)
-                return "UBE-85";
+                return "UBE-86";
 #else
-                return "LEGACY18_UBE-85";
+                return "LEGACY18_UBE-86";
 #endif
             }
         }
