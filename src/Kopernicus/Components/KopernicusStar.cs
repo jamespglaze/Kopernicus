@@ -70,6 +70,7 @@ namespace Kopernicus.Components
         /// </summary>
         public Color atmosphericTintCache;
         Color atmosphericTintCacheLerp;
+        Color atmosphericTintCacheSunflareLerp; // Sunflare needs to come back immediately, so needs to be set to white when (0,0,0,0)
 
         /// <summary>
         /// The currently active <see cref="KopernicusStar"/>, for stuff we can't patch
@@ -152,6 +153,7 @@ namespace Kopernicus.Components
             DontDestroyOnLoad(this);
             atmosphericTintCache = Color.white; // Default value (atmospheric extinction not enabled)
             atmosphericTintCacheLerp = Color.white;
+            atmosphericTintCacheSunflareLerp = Color.white;
             light = gameObject.GetComponent<Light>();
 
             // Gah
@@ -236,8 +238,11 @@ namespace Kopernicus.Components
             // Set precision
             sunRotationPrecision = MapView.MapIsEnabled ? sunRotationPrecisionMapView : sunRotationPrecisionDefault;
 
-            if (atmosphericTintCache != Color.black) // Blend colours to look nicer
-                atmosphericTintCacheLerp = Color.Lerp(atmosphericTintCacheLerp, atmosphericTintCache, 1f / (RuntimeUtility.RuntimeUtility.KopernicusConfig.SolarRefreshRate * 20f + 1f));
+            float lerpFactor = 1f / (RuntimeUtility.RuntimeUtility.KopernicusConfig.SolarRefreshRate * 20f + 1f);
+            // Blend colours to look nicer
+            if (atmosphericTintCache != Color.black)
+                atmosphericTintCacheSunflareLerp = Color.Lerp(atmosphericTintCacheSunflareLerp, atmosphericTintCache, lerpFactor);
+            atmosphericTintCacheLerp = Color.Lerp(atmosphericTintCacheLerp, atmosphericTintCache, lerpFactor);
 
             // Apply light settings
             Vector3d localSpace = ScaledSpace.ScaledToLocalSpace(target.position);
@@ -265,7 +270,7 @@ namespace Kopernicus.Components
             }
 
             // Set SunFlare color + tint
-            lensFlare.sunFlare.color = shifter.sunLensFlareColor * (atmosphericTintCache == Color.black ? Color.white : atmosphericTintCacheLerp);
+            lensFlare.sunFlare.color = shifter.sunLensFlareColor * (atmosphericTintCache == Color.black ? Color.white : atmosphericTintCacheSunflareLerp);
 
             // Set other stuff
             lensFlare.AU = shifter.au;
