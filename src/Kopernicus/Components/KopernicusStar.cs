@@ -66,6 +66,12 @@ namespace Kopernicus.Components
         }
 
         /// <summary>
+        /// Color tint on light sources computed from <see cref="KopernicusSunFlare"/> that tints local light sources. White when atmospheric extinction is not enabled.
+        /// </summary>
+        public Color atmosphericTintCache;
+        Color atmosphericTintCacheLerp;
+
+        /// <summary>
         /// The currently active <see cref="KopernicusStar"/>, for stuff we can't patch
         /// </summary>
         public static KopernicusStar Current;
@@ -144,6 +150,8 @@ namespace Kopernicus.Components
 
             Stars.Add(this);
             DontDestroyOnLoad(this);
+            atmosphericTintCache = Color.white; // Default value (atmospheric extinction not enabled)
+            atmosphericTintCacheLerp = Color.white;
             light = gameObject.GetComponent<Light>();
 
             // Gah
@@ -228,11 +236,14 @@ namespace Kopernicus.Components
             // Set precision
             sunRotationPrecision = MapView.MapIsEnabled ? sunRotationPrecisionMapView : sunRotationPrecisionDefault;
 
+            if (atmosphericTintCache != Color.black) // Blend colours to look nicer
+                atmosphericTintCacheLerp = Color.Lerp(atmosphericTintCacheLerp, atmosphericTintCache, 1f / (RuntimeUtility.RuntimeUtility.KopernicusConfig.SolarRefreshRate * 20f + 1f));
+
             // Apply light settings
             Vector3d localSpace = ScaledSpace.ScaledToLocalSpace(target.position);
             if (light)
             {
-                light.color = shifter.sunlightColor;
+                light.color = shifter.sunlightColor * atmosphericTintCacheLerp; // Local tint
                 light.intensity =
                     shifter.intensityCurve.Evaluate((Single)Vector3d.Distance(sun.position, localSpace));
                 light.shadowStrength = shifter.sunlightShadowStrength;
@@ -241,20 +252,20 @@ namespace Kopernicus.Components
             // Patch the ScaledSpace light
             if (scaledSunLight)
             {
-                scaledSunLight.color = shifter.scaledSunlightColor;
+                scaledSunLight.color = shifter.scaledSunlightColor; // No scaled space tint (applies only locally)
                 scaledSunLight.intensity = shifter.scaledIntensityCurve.Evaluate(
                     (Single)Vector3d.Distance(ScaledSpace.LocalToScaledSpace(sun.position), target.position));
             }
 
             if (HighLogic.LoadedSceneIsFlight && iva && iva.GetComponent<Light>())
             {
-                iva.GetComponent<Light>().color = shifter.ivaSunColor;
+                iva.GetComponent<Light>().color = shifter.ivaSunColor * atmosphericTintCacheLerp; // Local tint
                 iva.GetComponent<Light>().intensity =
                     shifter.ivaIntensityCurve.Evaluate((Single)Vector3d.Distance(sun.position, localSpace));
             }
 
-            // Set SunFlare color
-            lensFlare.sunFlare.color = shifter.sunLensFlareColor;
+            // Set SunFlare color + tint
+            lensFlare.sunFlare.color = shifter.sunLensFlareColor * (atmosphericTintCache == Color.black ? Color.white : atmosphericTintCacheLerp);
 
             // Set other stuff
             lensFlare.AU = shifter.au;
@@ -350,7 +361,10 @@ namespace Kopernicus.Components
                 directSunlight = true;
             }
             if (directSunlight)
-                return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d);
+            {
+                double atmosphericFraction = RuntimeUtility.RuntimeUtility.KopernicusConfig.EnableAtmosphericExtinction ? ThermoHelper.SunlightPercentage(truePosition, this) : 1d;
+                return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d) * atmosphericFraction;
+            }
 
             return 0;
         }
@@ -454,7 +468,10 @@ namespace Kopernicus.Components
                     directSunlight = true;
                 }
                 if (directSunlight)
-                    return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d);
+                {
+                    double atmosphericFraction = RuntimeUtility.RuntimeUtility.KopernicusConfig.EnableAtmosphericExtinction ? ThermoHelper.SunlightPercentage(truePosition, star) : 1d;
+                    return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d) * atmosphericFraction;
+                }
 
                 return 0;
             }

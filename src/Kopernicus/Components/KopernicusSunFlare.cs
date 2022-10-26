@@ -35,6 +35,8 @@ namespace Kopernicus.Components
     /// </summary>
     public class KopernicusSunFlare : SunFlare
     {
+        int FrameCounter = 0;
+
         protected override void Awake()
         {
             Camera.onPreCull += PreCull;
@@ -58,57 +60,18 @@ namespace Kopernicus.Components
             base.OnDestroy();
         }
 
-        private double CheckRaySphereIntersection(Vector3d rayDir, Vector3d offset, double radius)
-        {
-            double dir = Vector3d.Dot(rayDir, offset);
-            Vector3d ClosestPoint = offset - Math.Max(dir, 0d) * rayDir;
-            return ClosestPoint.magnitude - radius;
-        }
-
-        private float CheckAtmoDensity(CelestialBody b, float density, Vector3d cameraPosition)
-        {
-            MapObject mapTarget = b.MapObject;
-            if (mapTarget == null)
-                return density;
-
-            if (!mapTarget.GetComponent<MeshRenderer>().enabled)
-                return density;
-
-            if (mapTarget.celestialBody == sun)
-            {
-                foreach (CelestialBody n in b.orbitingBodies)
-                    density += CheckAtmoDensity(n, 0f, cameraPosition);
-                return density;
-            }
-
-            Vector3d targetDistance = PlanetariumCamera.fetch.transform.position - mapTarget.transform.position;
-            if (b.atmosphere)
-            {
-                float altitude = (float)CheckRaySphereIntersection(cameraPosition, targetDistance * ScaledSpace.ScaleFactor, b.Radius);
-                FloatCurve curve = b.atmospherePressureCurve;
-                density += curve.Evaluate(Mathf.Clamp(altitude, curve.minTime, curve.maxTime));
-            }
-            
-            if (b.orbitingBodies.Count != 0)
-            {
-                if (CheckRaySphereIntersection(cameraPosition, targetDistance * ScaledSpace.ScaleFactor, b.sphereOfInfluence) > 0)
-                    return density;
-
-                foreach (CelestialBody n in b.orbitingBodies)
-                    density += CheckAtmoDensity(n, 0f, cameraPosition);
-            }
-            return density;
-        }
-
         private void AtmosphericScattering()
         {
-            Vector3d cameraPosition = (PlanetariumCamera.fetch.transform.position - sun.transform.position).normalized;
-            float density = CheckAtmoDensity(FlightGlobals.Bodies[0], 0f, cameraPosition);
-            density = Mathf.Sqrt(density / 150f);
+            FrameCounter++;
+            if (FrameCounter < RuntimeUtility.RuntimeUtility.KopernicusConfig.SolarRefreshRate * 20) // Save resources
+                return;
+            FrameCounter = UnityEngine.Random.Range(0, 10);
+
+            float density = (float)ThermoHelper.OpticalDepth(ScaledSpace.LocalToScaledSpace(PlanetariumCamera.fetch.transform.position) * -ScaledSpace.ScaleFactor, KopernicusStar.CelestialBodies[sun]);
             float r = Mathf.Exp(.1f - density * .3f);
-            float g = Mathf.Exp(.1f - density * 1.1f);
-            float b = Mathf.Exp(.1f - density * 2.6f);
-            sunFlare.color = new Color(r, g, b);
+            float g = Mathf.Exp(.1f - density * .72f);
+            float b = Mathf.Exp(.1f - density * 1.65f);
+            KopernicusStar.CelestialBodies[sun].atmosphericTintCache = new Color(r, g, b);
         }
 
         // Overload the stock LateUpdate function
