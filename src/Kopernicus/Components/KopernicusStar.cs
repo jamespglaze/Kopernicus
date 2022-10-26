@@ -66,6 +66,13 @@ namespace Kopernicus.Components
         }
 
         /// <summary>
+        /// Color tint on light sources computed from <see cref="KopernicusSunFlare"/> that tints local light sources. White when atmospheric extinction is not enabled.
+        /// </summary>
+        public Color atmosphericTintCache;
+        Color atmosphericTintCacheLerp;
+        Color atmosphericTintCacheSunflareLerp; // Sunflare needs to come back immediately, so needs to be set to white when (0,0,0,0)
+
+        /// <summary>
         /// The currently active <see cref="KopernicusStar"/>, for stuff we can't patch
         /// </summary>
         public static KopernicusStar Current;
@@ -144,6 +151,9 @@ namespace Kopernicus.Components
 
             Stars.Add(this);
             DontDestroyOnLoad(this);
+            atmosphericTintCache = Color.white; // Default value (atmospheric extinction not enabled)
+            atmosphericTintCacheLerp = Color.white;
+            atmosphericTintCacheSunflareLerp = Color.white;
             light = gameObject.GetComponent<Light>();
 
             // Gah
@@ -228,11 +238,17 @@ namespace Kopernicus.Components
             // Set precision
             sunRotationPrecision = MapView.MapIsEnabled ? sunRotationPrecisionMapView : sunRotationPrecisionDefault;
 
+            float lerpFactor = 1f / (RuntimeUtility.RuntimeUtility.KopernicusConfig.SolarRefreshRate * 20f + 1f);
+            // Blend colours to look nicer
+            if (atmosphericTintCache != Color.black)
+                atmosphericTintCacheSunflareLerp = Color.Lerp(atmosphericTintCacheSunflareLerp, atmosphericTintCache, lerpFactor);
+            atmosphericTintCacheLerp = Color.Lerp(atmosphericTintCacheLerp, atmosphericTintCache, lerpFactor);
+
             // Apply light settings
             Vector3d localSpace = ScaledSpace.ScaledToLocalSpace(target.position);
             if (light)
             {
-                light.color = shifter.sunlightColor;
+                light.color = shifter.sunlightColor * atmosphericTintCacheLerp; // Local tint
                 light.intensity =
                     shifter.intensityCurve.Evaluate((Single)Vector3d.Distance(sun.position, localSpace));
                 light.shadowStrength = shifter.sunlightShadowStrength;
@@ -241,20 +257,20 @@ namespace Kopernicus.Components
             // Patch the ScaledSpace light
             if (scaledSunLight)
             {
-                scaledSunLight.color = shifter.scaledSunlightColor;
+                scaledSunLight.color = shifter.scaledSunlightColor; // No scaled space tint (applies only locally)
                 scaledSunLight.intensity = shifter.scaledIntensityCurve.Evaluate(
                     (Single)Vector3d.Distance(ScaledSpace.LocalToScaledSpace(sun.position), target.position));
             }
 
             if (HighLogic.LoadedSceneIsFlight && iva && iva.GetComponent<Light>())
             {
-                iva.GetComponent<Light>().color = shifter.ivaSunColor;
+                iva.GetComponent<Light>().color = shifter.ivaSunColor * atmosphericTintCacheLerp; // Local tint
                 iva.GetComponent<Light>().intensity =
                     shifter.ivaIntensityCurve.Evaluate((Single)Vector3d.Distance(sun.position, localSpace));
             }
 
-            // Set SunFlare color
-            lensFlare.sunFlare.color = shifter.sunLensFlareColor;
+            // Set SunFlare color + tint
+            lensFlare.sunFlare.color = shifter.sunLensFlareColor * (atmosphericTintCache == Color.black ? Color.white : atmosphericTintCacheSunflareLerp);
 
             // Set other stuff
             lensFlare.AU = shifter.au;
@@ -316,11 +332,13 @@ namespace Kopernicus.Components
             // Get sunVector
             Boolean directSunlight = false;
             Vector3 integratorPosition = vessel.transform.position;
+
+            Vector3d truePosition = vessel.GetWorldPos3D();
+            Vector3d sunPosition = sun.position;
             Vector3d scaledSpace = ScaledSpace.LocalToScaledSpace(integratorPosition);
-            Vector3 position = sun.scaledBody.transform.position;
-            Double scale = Math.Max((position - scaledSpace).magnitude, 1);
-            Vector3 sunVector = (position - scaledSpace) / scale;
-            Ray ray = new Ray(ScaledSpace.LocalToScaledSpace(integratorPosition), sunVector);
+
+            Vector3d sunVector = (sunPosition - truePosition).normalized;
+            Ray ray = new Ray(scaledSpace, sunVector);
 
             // Get Thermal Stats
             if (vessel.mainBody.atmosphere)
@@ -332,22 +350,23 @@ namespace Kopernicus.Components
                 }
             }
 
-            // Get Solar Flux
-            Double realDistanceToSun = 0;
+            // Get True Solar Flux
+            Double realDistanceToSun = 1E+19d;
+            double solarRad = sun.Radius;
             if (!Physics.Raycast(ray, out RaycastHit raycastHit, Single.MaxValue, ModularFlightIntegrator.SunLayerMask))
             {
                 directSunlight = true;
-                realDistanceToSun = scale * ScaledSpace.ScaleFactor - sun.Radius;
+                realDistanceToSun = (truePosition - sunPosition).magnitude;
             }
             else if (raycastHit.transform.GetComponent<ScaledMovement>().celestialBody == sun)
             {
-                realDistanceToSun = ScaledSpace.ScaleFactor * raycastHit.distance;
+                realDistanceToSun = ScaledSpace.ScaleFactor * raycastHit.distance + solarRad;
                 directSunlight = true;
             }
-
             if (directSunlight)
             {
-                return PhysicsGlobals.SolarLuminosity / (12.5663706143592 * realDistanceToSun * realDistanceToSun);
+                double atmosphericFraction = RuntimeUtility.RuntimeUtility.KopernicusConfig.EnablePhysicalAtmosphericExtinction ? ThermoHelper.SunlightPercentage(truePosition, this) : 1d;
+                return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d) * atmosphericFraction;
             }
 
             return 0;
@@ -363,51 +382,34 @@ namespace Kopernicus.Components
             PhysicsGlobals.SolarInsolationAtHome = Current.shifter.solarInsolation;
             CalculatePhysics();
 
-            // Get "Correct" values
+            // Calculate but discard some values anyway since it's broken
             flightIntegrator.BaseFICalculateSunBodyFlux();
 
-            // FI Values
-            Boolean directSunlight = flightIntegrator.Vessel.directSunlight;
-            Double solarFlux = flightIntegrator.solarFlux;
-            if (!SolarFlux.ContainsKey(Current.StarName))
-            {
-                SolarFlux.Add(Current.StarName, solarFlux);
-            }
-            else
-            {
-                SolarFlux[Current.StarName] = solarFlux;
-            }
-
+            // Ignore broken FI values
+            Boolean directSunlight = false;
+            Double solarFlux = 0d;
             // Calculate the values for all bodies
-            foreach (KopernicusStar star in Stars.Where(s => s.sun != FlightIntegrator.sunBody))
+            foreach (KopernicusStar star in Stars)
             {
                 // Set Physics
                 PhysicsGlobals.SolarLuminosityAtHome = star.shifter.solarLuminosity;
                 PhysicsGlobals.SolarInsolationAtHome = star.shifter.solarInsolation;
-                CalculatePhysics();
+
+                //Useless applied per star as it is a static method.
+                //CalculatePhysics();
 
                 // Calculate Flux
                 Double flux = Flux(flightIntegrator, star);
 
                 // And save them
                 if (flux > 0)
-                {
                     directSunlight = true;
-                }
-                else
-                {
-                    directSunlight = false;
-                }
 
                 solarFlux += flux;
                 if (!SolarFlux.ContainsKey(star.StarName))
-                {
                     SolarFlux.Add(star.StarName, flux);
-                }
                 else
-                {
                     SolarFlux[star.StarName] = flux;
-                }
             }
 
             // Reapply
@@ -445,28 +447,31 @@ namespace Kopernicus.Components
                 // Get sunVector
                 Boolean directSunlight = false;
                 Vector3 integratorPosition = fi.transform.position;
+
+                Vector3d truePosition = fi.Vessel.GetWorldPos3D();
+                Vector3d sunPosition = star.sun.position;
                 Vector3d scaledSpace = ScaledSpace.LocalToScaledSpace(integratorPosition);
-                Vector3 position = star.sun.scaledBody.transform.position;
-                Double scale = Math.Max((position - scaledSpace).magnitude, 1);
-                Vector3 sunVector = (position - scaledSpace) / scale;
-                Ray ray = new Ray(ScaledSpace.LocalToScaledSpace(integratorPosition), sunVector);
+
+                Vector3d sunVector = (sunPosition - truePosition).normalized;
+                Ray ray = new Ray(scaledSpace, sunVector);
 
                 // Get Solar Flux
-                Double realDistanceToSun = 0;
+                Double realDistanceToSun = 1E+19d;
+                double solarRad = star.sun.Radius;
                 if (!Physics.Raycast(ray, out RaycastHit raycastHit, Single.MaxValue, ModularFlightIntegrator.SunLayerMask))
                 {
                     directSunlight = true;
-                    realDistanceToSun = scale * ScaledSpace.ScaleFactor - star.sun.Radius;
+                    realDistanceToSun = (truePosition - sunPosition).magnitude;
                 }
                 else if (raycastHit.transform.GetComponent<ScaledMovement>().celestialBody == star.sun)
                 {
-                    realDistanceToSun = ScaledSpace.ScaleFactor * raycastHit.distance;
+                    realDistanceToSun = ScaledSpace.ScaleFactor * raycastHit.distance + solarRad;
                     directSunlight = true;
                 }
-
                 if (directSunlight)
                 {
-                    return PhysicsGlobals.SolarLuminosity / (12.5663706143592 * realDistanceToSun * realDistanceToSun);
+                    double atmosphericFraction = RuntimeUtility.RuntimeUtility.KopernicusConfig.EnablePhysicalAtmosphericExtinction ? ThermoHelper.SunlightPercentage(truePosition, star) : 1d;
+                    return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d) * atmosphericFraction;
                 }
 
                 return 0;
