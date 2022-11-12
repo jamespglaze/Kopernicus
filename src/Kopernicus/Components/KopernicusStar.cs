@@ -365,6 +365,7 @@ namespace Kopernicus.Components
             }
             if (directSunlight)
             {
+                realDistanceToSun -= RuntimeUtility.RuntimeUtility.KopernicusConfig.EnableRealisticFlux ? solarRad : 0d;
                 double atmosphericFraction = RuntimeUtility.RuntimeUtility.KopernicusConfig.EnablePhysicalAtmosphericExtinction ? ThermoHelper.SunlightPercentage(truePosition, this) : 1d;
                 return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d) * atmosphericFraction;
             }
@@ -470,6 +471,7 @@ namespace Kopernicus.Components
                 }
                 if (directSunlight)
                 {
+                    realDistanceToSun -= RuntimeUtility.RuntimeUtility.KopernicusConfig.EnableRealisticFlux ? solarRad : 0d;
                     double atmosphericFraction = RuntimeUtility.RuntimeUtility.KopernicusConfig.EnablePhysicalAtmosphericExtinction ? ThermoHelper.SunlightPercentage(truePosition, star) : 1d;
                     return PhysicsGlobals.SolarLuminosity / (realDistanceToSun * realDistanceToSun * 4d * 3.14159265358979d) * atmosphericFraction;
                 }
