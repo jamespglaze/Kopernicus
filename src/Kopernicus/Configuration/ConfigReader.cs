@@ -102,7 +102,7 @@ namespace Kopernicus.Configuration
                 Debug.Log("SettingsWindowYcoord: " + SettingsWindowYcoord);
                 Debug.Log("EnableVisualAtmosphericExtinction: " + EnableVisualAtmosphericExtinction);
                 Debug.Log("EnablePhysicalAtmosphericExtinction: " + EnablePhysicalAtmosphericExtinction);
-                Debug.Log("EnablePhysicalAtmosphericExtinction: " + EnableRealisticFlux);
+                Debug.Log("EnableRealisticFlux: " + EnableRealisticFlux);
             }
             catch
             {
